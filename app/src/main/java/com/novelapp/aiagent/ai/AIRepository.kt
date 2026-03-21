@@ -1,14 +1,12 @@
 package com.novelapp.aiagent.ai
 
+import com.novelapp.aiagent.ai.config.ModelConfigManager
+import com.novelapp.aiagent.ai.config.ModelFeature
+import com.novelapp.aiagent.ai.providers.AIProviderFactory
 import com.novelapp.aiagent.model.AIRequest
 import com.novelapp.aiagent.model.AIResponse
 import com.novelapp.aiagent.model.AIResult
 import com.novelapp.aiagent.model.Checkpoint
-import com.novelapp.aiagent.model.NovelContext
-import com.novelapp.aiagent.model.ChapterSummary
-import com.novelapp.aiagent.model.CharacterInfo
-import com.novelapp.aiagent.data.repository.ChapterRepository
-import com.novelapp.aiagent.data.repository.NovelRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -16,22 +14,20 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * AI仓库
+ * AI仓库（重构版）
  *
  * 职责：
  * - 统一AI接口访问
- * - 超时重试机制
- * - 断点续创管理
- * - 上下文管理
+ * - 使用ModelConfigManager获取配置
+ * - 支持多模型切换
  *
  * @see docs/design/api.md
+ * @see AGENTS.md AI接口模块规范
  */
 @Singleton
 class AIRepository @Inject constructor(
-    private val aiClient: AIClient,
-    private val contextManager: ContextManager,
-    private val novelRepository: NovelRepository,
-    private val chapterRepository: ChapterRepository
+    private val modelConfigManager: ModelConfigManager,
+    private val contextManager: ContextManager
 ) {
     companion object {
         private const val TAG = "AIRepository"
@@ -41,11 +37,8 @@ class AIRepository @Inject constructor(
         val RETRY_INTERVALS = listOf(1000L, 2000L, 4000L)
 
         // 检查点配置
-        const val CHECKPOINT_TOKEN_INTERVAL = 500  // 每500字保存检查点
+        const val CHECKPOINT_TOKEN_INTERVAL = 500
         const val MAX_CHECKPOINTS = 3
-
-        // 可重试的错误码
-        val RETRYABLE_CODES = listOf(429, 500, 503, 504)
     }
 
     // 活跃的检查点
@@ -64,6 +57,13 @@ class AIRepository @Inject constructor(
         chapterId: String,
         instruction: String? = null
     ): AIResult<AIResponse> {
+        // 检查是否已登录
+        if (!modelConfigManager.isLoggedIn()) {
+            return AIResult.failure("请先登录并配置模型")
+        }
+
+        val config = modelConfigManager.getConfig()!!
+
         return withContext(Dispatchers.IO) {
             // 构建上下文
             val context = contextManager.buildContext(novelId, chapterId)
@@ -74,12 +74,19 @@ class AIRepository @Inject constructor(
                 chapterId = chapterId,
                 context = context,
                 instruction = instruction,
-                maxTokens = AIClient.DEFAULT_MAX_TOKENS,
-                temperature = AIClient.DEFAULT_TEMPERATURE
+                maxTokens = config.maxTokens,
+                temperature = config.temperature
             )
 
+            // 获取对应的Provider
+            val provider = AIProviderFactory.getProvider(config.modelType)
+            if (provider == null) {
+                Timber.e("No provider found for model: ${config.modelType}")
+                return@withContext AIResult.failure("不支持的模型类型")
+            }
+
             // 执行请求（带重试）
-            executeWithRetry(request)
+            executeWithRetry(provider, config, request, 0)
         }
     }
 
@@ -89,8 +96,11 @@ class AIRepository @Inject constructor(
      * @param requestId 请求ID
      */
     suspend fun cancelGeneration(requestId: String): AIResult<Unit> {
+        val config = modelConfigManager.getConfig() ?: return AIResult.failure("未登录")
+
         return withContext(Dispatchers.IO) {
-            aiClient.cancel(requestId)
+            val provider = AIProviderFactory.getProvider(config.modelType)
+            provider?.cancel(requestId) ?: AIResult.failure("Provider不存在")
         }
     }
 
@@ -100,24 +110,26 @@ class AIRepository @Inject constructor(
      * @param checkpointId 检查点ID
      */
     suspend fun resumeGeneration(checkpointId: String): AIResult<AIResponse> {
-        return withContext(Dispatchers.IO) {
-            val checkpoint = activeCheckpoints[checkpointId]
-            if (checkpoint == null) {
-                AIResult.failure("检查点不存在或已过期")
-            } else if (checkpoint.isExpired()) {
-                activeCheckpoints.remove(checkpointId)
-                AIResult.failure("检查点已过期")
-            } else {
-                aiClient.resume(checkpointId)
-            }
+        val checkpoint = activeCheckpoints[checkpointId]
+            ?: return AIResult.failure("检查点不存在或已过期")
+
+        if (checkpoint.isExpired()) {
+            activeCheckpoints.remove(checkpointId)
+            return AIResult.failure("检查点已过期")
         }
+
+        // 使用检查点信息重新生成
+        return generateContent(
+            novelId = checkpoint.novelId,
+            chapterId = checkpoint.chapterId,
+            instruction = "继续从上次中断的地方续写"
+        )
     }
 
     /**
      * 获取活跃的检查点
      *
      * @param novelId 小说ID
-     * @return 检查点列表
      */
     fun getActiveCheckpoints(novelId: String): List<Checkpoint> {
         return activeCheckpoints.values
@@ -141,25 +153,52 @@ class AIRepository @Inject constructor(
     }
 
     /**
+     * 检查是否支持某特性
+     */
+    fun supportsFeature(feature: ModelFeature): Boolean {
+        return modelConfigManager.supportsFeature(feature)
+    }
+
+    /**
+     * 检查是否已登录
+     */
+    fun isLoggedIn(): Boolean {
+        return modelConfigManager.isLoggedIn()
+    }
+
+    /**
      * 带重试的执行
      */
     private suspend fun executeWithRetry(
+        provider: com.novelapp.aiagent.ai.providers.AIProvider,
+        config: com.novelapp.aiagent.ai.config.ModelConfig,
         request: AIRequest,
-        retryCount: Int = 0
+        retryCount: Int
     ): AIResult<AIResponse> {
-        val result = aiClient.generate(request)
+        val result = provider.generate(config, request)
 
         if (result.isSuccess) {
+            // 保存检查点
+            result.data?.data?.let { content ->
+                if (content.tokens >= CHECKPOINT_TOKEN_INTERVAL) {
+                    saveCheckpoint(
+                        requestId = content.requestId,
+                        novelId = request.novelId,
+                        chapterId = request.chapterId,
+                        generatedText = content.text,
+                        tokens = content.tokens
+                    )
+                }
+            }
             return result
         }
 
         // 检查是否需要重试
-        val response = result.data
-        if (response != null && response.code in RETRYABLE_CODES && retryCount < MAX_RETRY) {
+        if (retryCount < MAX_RETRY) {
             val delay = RETRY_INTERVALS.getOrElse(retryCount) { 4000L }
             Timber.w("Retrying AI request (attempt ${retryCount + 1}/$MAX_RETRY) after ${delay}ms")
             kotlinx.coroutines.delay(delay)
-            return executeWithRetry(request, retryCount + 1)
+            return executeWithRetry(provider, config, request, retryCount + 1)
         }
 
         return result
