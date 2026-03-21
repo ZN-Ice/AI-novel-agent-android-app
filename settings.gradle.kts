@@ -11,7 +11,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }  // ffmpeg-kit (JitPack)
+        // ffmpeg-kit 已迁移到 Maven Central，不再需要 JitPack
     }
 }
 

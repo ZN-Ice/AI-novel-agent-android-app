@@ -30,8 +30,8 @@ kotlinx-serialization = "1.6.2"
 # 协程
 coroutines = "1.7.3"
 
-# ffmpeg
-ffmpeg-kit = "6.0-2"
+# ffmpeg (Maven Central)
+ffmpeg-kit = "6.0"
 
 # 图片加载
 glide = "4.16.0"
@@ -89,10 +89,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
-# ffmpeg语音处理 (JitPack - arthenica archived repo)
-# 注意: FFmpeg-kit已于2025年4月1日从Maven Central移除
-# 使用JitPack访问归档仓库
-ffmpeg-kit-full = { group = "com.github.Arthenica.FFmpegKit", name = "ffmpeg-kit-full", version.ref = "ffmpeg-kit" }
+# ffmpeg语音处理 (Maven Central)
+# 官方坐标: com.arthenica:ffmpeg-kit-full
+ffmpeg-kit-full = { group = "com.arthenica", name = "ffmpeg-kit-full", version.ref = "ffmpeg-kit" }
 
 # 图片加载
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
