@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    AI小说安卓App Lint校验规则
+
+    规则说明：
+    - error: 必须修复，否则阻断构建
+    - warning: 建议修复，不阻断构建
+    - ignore: 忽略检查
+    - fatal: 严重错误，必须立即修复
+-->
+<lint>
+    <!-- ============ 代码规范 ============ -->
+
+    <!-- 硬编码文本（禁止） -->
+    <issue id="HardcodedText" severity="error" />
+
+    <!-- 硬编码颜色值 -->
+    <issue id="HardcodedColor" severity="warning" />
+
+    <!-- 硬编码尺寸值 -->
+    <issue id="HardcodedSize" severity="warning" />
+
+    <!-- 未使用的资源 -->
+    <issue id="UnusedResources" severity="warning" />
+
+    <!-- 未使用的代码 -->
+    <issue id="UnusedIds" severity="warning" />
+
+    <!-- ============ 性能规范 ============ -->
+
+    <!-- 过度绘制 -->
+    <issue id="Overdraw" severity="warning" />
+
+    <!-- 嵌套权重 -->
+    <issue id="NestedWeights" severity="error" />
+
+    <!-- 过深布局 -->
+    <issue id="TooDeepLayout" severity="warning">
+        <ignore path="res/layout/*.xml" />
+    </issue>
+
+    <!-- 太多视图 -->
+    <issue id="TooManyViews" severity="warning" />
+
+    <!-- 主线程IO操作 -->
+    <issue id="Recycle" severity="error" />
+
+    <!-- ============ 安全规范 ============ -->
+
+    <!-- 硬编码密钥/密码 -->
+    <issue id="HardcodedCredential" severity="fatal" />
+
+    <!-- 不安全的网络配置 -->
+    <issue id="InsecureConfiguration" severity="error" />
+
+    <!-- 设置可调试 -->
+    <issue id="SetJavaScriptEnabled" severity="warning" />
+
+    <!-- ============ 国际化 ============ -->
+
+    <!-- 缺少翻译 -->
+    <issue id="MissingTranslation" severity="warning" />
+
+    <!-- 额外翻译 -->
+    <issue id="ExtraTranslation" severity="ignore" />
+
+    <!-- 文本方向 -->
+    <issue id="RtlHardcoded" severity="warning" />
+
+    <!-- ============ 无障碍 ============ -->
+
+    <!-- 缺少内容描述 -->
+    <issue id="ContentDescription" severity="warning" />
+
+    <!-- 可点击但不可聚焦 -->
+    <issue id="KeyboardInaccessibleWidget" severity="warning" />
+
+    <!-- ============ 兼容性 ============ -->
+
+    <!-- 新API调用 -->
+    <issue id="NewApi" severity="error" />
+
+    <!-- 内联API调用 -->
+    <issue id="InlinedApi" severity="warning" />
+
+    <!-- ============ Kotlin规范 ============ -->
+
+    <!-- Kotlin协程使用 -->
+    <issue id="CoroutineCreationDuringComposition" severity="error" />
+
+    <!-- ============ 自定义规则 ============ -->
+
+    <!-- 禁止使用System.out -->
+    <issue id="PrintStackTrace" severity="error" />
+
+    <!-- 正确使用Toast -->
+    <issue id="ShowToast" severity="warning" />
+
+    <!-- ============ 忽略第三方库检查 ============ -->
+    <issue id="InvalidPackage">
+        <ignore path="**/ffmpeg-kit*.jar" />
+    </issue>
+
+</lint>

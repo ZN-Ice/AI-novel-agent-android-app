@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============ 应用信息 ============ -->
+    <string name="app_name">AI小说创作</string>
+
+    <!-- ============ 页面标题 ============ -->
+    <string name="title_home">我的小说</string>
+    <string name="title_editor">创作空间</string>
+    <string name="title_create">新建小说</string>
+    <string name="title_delete">确认删除</string>
+
+    <!-- ============ 首页 ============ -->
+    <string name="home_empty_title">还没有小说</string>
+    <string name="home_empty_hint">点击 + 开始你的创作之旅</string>
+    <string name="home_voice_hint">说出\"新建小说\"开始创作</string>
+    <string name="home_recent_edit">最近编辑：%s</string>
+    <string name="home_stats">章节：%d章 | 字数：%s</string>
+
+    <!-- ============ 新建小说 ============ -->
+    <string name="create_title">新建小说</string>
+    <string name="create_name_label">小说名称</string>
+    <string name="create_name_hint">请输入小说名称…</string>
+    <string name="create_genre_label">小说类型（可选）</string>
+    <string name="create_genre_xuanhuan">玄幻</string>
+    <string name="create_genre_dushi">都市</string>
+    <string name="create_genrekehuan">科幻</string>
+    <string name="create_genre_wuxia">武侠</string>
+    <string name="create_genre_qihuan">奇幻</string>
+    <string name="create_genre_lishi">历史</string>
+    <string name="create_cancel">取消</string>
+    <string name="create_confirm">创建</string>
+
+    <!-- ============ 删除确认 ============ -->
+    <string name="delete_title">确认删除</string>
+    <string name="delete_message">确定要删除《%s》吗？</string>
+    <string name="delete_hint">删除后将保留7天，期间可恢复。7天后将永久删除所有内容。</string>
+    <string name="delete_cancel">取消</string>
+    <string name="delete_confirm">删除</string>
+
+    <!-- ============ 创作空间 ============ -->
+    <string name="editor_chapter_new">新建章节</string>
+    <string name="editor_ai_generate">AI续写</string>
+    <string name="editor_voice_input">语音输入</string>
+    <string name="editor_saving">保存中…</string>
+    <string name="editor_saved">已保存</string>
+
+    <!-- ============ 语音模块 ============ -->
+    <string name="voice_listening">正在聆听…</string>
+    <string name="voice_processing">正在处理…</string>
+    <string name="voice_success">识别成功</string>
+    <string name="voice_error">识别失败，请重试</string>
+    <string name="voice_permission_denied">请授予麦克风权限</string>
+    <string name="voice_hint_create">说出\"新建小说\"开始创作</string>
+    <string name="voice_hint_delete">说出\"删除小说\"移除作品</string>
+    <string name="voice_hint_write">说出\"写一段\"让AI帮你创作</string>
+
+    <!-- ============ AI生成 ============ -->
+    <string name="ai_generating">AI正在创作中…</string>
+    <string name="ai_timeout">生成超时，请重试</string>
+    <string name="ai_error">生成失败：%s</string>
+    <string name="ai_cancel">已取消</string>
+
+    <!-- ============ 通用操作 ============ -->
+    <string name="action_ok">确定</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_save">保存</string>
+    <string name="action_delete">删除</string>
+    <string name="action_undo">撤销</string>
+    <string name="action_redo">重做</string>
+
+    <!-- ============ 提示消息 ============ -->
+    <string name="toast_create_success">小说创建成功</string>
+    <string name="toast_delete_success">已删除，7天内可恢复</string>
+    <string name="toast_save_success">保存成功</string>
+    <string name="toast_network_error">网络连接失败</string>
+    <string name="toast_unknown_error">发生未知错误</string>
+
+    <!-- ============ 错误信息 ============ -->
+    <string name="error_name_empty">请输入小说名称</string>
+    <string name="error_name_too_long">小说名称不能超过50个字符</string>
+    <string name="error_name_duplicate">已存在同名小说</string>
+
+    <!-- ============ 无障碍 ============ -->
+    <string name="cd_novel_icon">小说图标</string>
+    <string name="cd_delete_novel">删除小说</string>
+    <string name="cd_voice_button">语音输入按钮</string>
+    <string name="cd_ai_generate">AI生成按钮</string>
+</resources>

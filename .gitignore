@@ -1,14 +1,16 @@
-# Gradle files
+# ============ Gradle ============
 .gradle/
 build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 
-# Local configuration file (sdk path, etc)
+# ============ 本地配置 ============
 local.properties
 
-# Log/OS Files
+# ============ 日志文件 ============
 *.log
 
-# Android Studio generated files and folders
+# ============ Android Studio ============
 captures/
 .externalNativeBuild/
 .cxx/
@@ -16,19 +18,65 @@ captures/
 *.apk
 output-metadata.json
 
-# IntelliJ
+# ============ IntelliJ IDEA ============
 *.iml
 .idea/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
-# Keystore files
+# ============ 签名文件（敏感） ============
 *.jks
 *.keystore
+keystore.properties
 
-# Google Services (e.g. APIs or Firebase)
+# ============ Google Services ============
 google-services.json
 
-# Android Profiling
+# ============ 性能分析 ============
 *.hprof
+
+# ============ 敏感信息（API密钥等） ============
+secrets.properties
+api_keys.properties
+*.secret
+
+# ============ 测试输出 ============
+app/src/test/resources/
+test-results/
+test-reports/
+
+# ============ Lint输出 ============
+lint-results/
+lint-reports/
+
+# ============ 临时文件 ============
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ============ 操作系统文件 ============
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============ 语音缓存 ============
+voice_cache/
+*.pcm
+*.wav
+
+# ============ 小说草稿缓存 ============
+novels_cache/
+drafts/
+
+# ============ Kotlin ============
+*.class
+
+# ============ 文档生成 ============
+docs/generated/
