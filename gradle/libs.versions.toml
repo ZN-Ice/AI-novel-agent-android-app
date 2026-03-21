@@ -89,8 +89,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
-# ffmpeg语音处理 (Maven Central)
-ffmpeg-kit-full = { group = "com.arthenica", name = "ffmpeg-kit-full", version.ref = "ffmpeg-kit" }
+# ffmpeg语音处理 (Maven Central - mrljdx fork)
+# 注意: 原com.arthenica已于2025年1月退役，使用社区fork版本
+ffmpeg-kit-full = { group = "com.mrljdx", name = "ffmpeg-kit-full", version.ref = "ffmpeg-kit" }
 
 # 图片加载
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
