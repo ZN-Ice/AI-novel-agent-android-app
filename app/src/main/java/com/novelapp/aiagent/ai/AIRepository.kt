@@ -2,6 +2,7 @@ package com.novelapp.aiagent.ai
 
 import com.novelapp.aiagent.ai.config.ModelConfigManager
 import com.novelapp.aiagent.ai.config.ModelFeature
+import com.novelapp.aiagent.ai.config.ModelProviderType
 import com.novelapp.aiagent.ai.providers.AIProviderFactory
 import com.novelapp.aiagent.model.AIRequest
 import com.novelapp.aiagent.model.AIResponse
@@ -79,10 +80,10 @@ class AIRepository @Inject constructor(
             )
 
             // 获取对应的Provider
-            val provider = AIProviderFactory.getProvider(config.modelType)
+            val provider = AIProviderFactory.getProvider(config.providerType)
             if (provider == null) {
-                Timber.e("No provider found for model: ${config.modelType}")
-                return@withContext AIResult.failure("不支持的模型类型")
+                Timber.e("No provider found for: ${config.providerType}")
+                return@withContext AIResult.failure("不支持的模型提供商")
             }
 
             // 执行请求（带重试）
@@ -99,7 +100,7 @@ class AIRepository @Inject constructor(
         val config = modelConfigManager.getConfig() ?: return AIResult.failure("未登录")
 
         return withContext(Dispatchers.IO) {
-            val provider = AIProviderFactory.getProvider(config.modelType)
+            val provider = AIProviderFactory.getProvider(config.providerType)
             provider?.cancel(requestId) ?: AIResult.failure("Provider不存在")
         }
     }

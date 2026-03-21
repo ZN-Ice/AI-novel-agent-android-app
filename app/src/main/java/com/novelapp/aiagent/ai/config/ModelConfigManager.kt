@@ -22,6 +22,9 @@ import javax.inject.Singleton
  * - 提供配置变更通知
  *
  * 使用EncryptedSharedPreferences安全存储敏感信息
+ *
+ * @see ModelProviderType 支持的提供商类型
+ * @see GLMModel 支持的GLM模型
  */
 @Singleton
 class ModelConfigManager @Inject constructor(
@@ -29,7 +32,7 @@ class ModelConfigManager @Inject constructor(
 ) {
     companion object {
         private const val TAG = "ModelConfigManager"
-        private const val PREFS_FILE_NAME = "ai_model_config"
+        private const val PREFS_FILE_NAME = "ai_model_config_encrypted"
         private const val KEY_MODEL_CONFIG = "model_config"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
     }
@@ -38,6 +41,7 @@ class ModelConfigManager @Inject constructor(
         ignoreUnknownKeys = true
         encodeDefaults = true
         isLenient = true
+        prettyPrint = false
     }
 
     // 加密的SharedPreferences
@@ -80,7 +84,7 @@ class ModelConfigManager @Inject constructor(
                 if (configJson != null) {
                     val config = json.decodeFromString<ModelConfig>(configJson)
                     _currentConfig.value = config
-                    Timber.i("Model config loaded: ${config.modelType.displayName}")
+                    Timber.i("Model config loaded: ${config.getDisplayName()}")
                 }
             }
         } catch (e: Exception) {
@@ -94,7 +98,7 @@ class ModelConfigManager @Inject constructor(
      * 登录并保存配置
      *
      * @param loginConfig 登录配置
-     * @return 是否成功
+     * @return 登录结果
      */
     fun login(loginConfig: LoginConfig): LoginResult {
         // 验证配置
@@ -123,7 +127,7 @@ class ModelConfigManager @Inject constructor(
             _currentConfig.value = modelConfig
             _isLoggedIn.value = true
 
-            Timber.i("Login successful: ${modelConfig.modelType.displayName}")
+            Timber.i("Login successful: ${modelConfig.getDisplayName()}")
             LoginResult.Success(modelConfig)
         } catch (e: Exception) {
             Timber.e(e, "Failed to save model config")
@@ -151,7 +155,7 @@ class ModelConfigManager @Inject constructor(
                 .apply()
 
             _currentConfig.value = newConfig
-            Timber.i("Config updated: ${newConfig.modelType.displayName}")
+            Timber.i("Config updated: ${newConfig.getDisplayName()}")
             true
         } catch (e: Exception) {
             Timber.e(e, "Failed to update config")
@@ -214,18 +218,61 @@ class ModelConfigManager @Inject constructor(
     }
 
     /**
-     * 获取模型类型（如果已登录）
+     * 获取提供商类型（如果已登录）
      */
-    fun getModelType(): ModelType? {
-        return _currentConfig.value?.modelType
+    fun getProviderType(): ModelProviderType? {
+        return _currentConfig.value?.providerType
+    }
+
+    /**
+     * 获取GLM模型类型（如果已登录且使用GLM）
+     */
+    fun getGLMModel(): GLMModel? {
+        return _currentConfig.value?.glmModel
     }
 
     /**
      * 检查是否支持某特性
+     *
+     * 基于提供商类型的特性支持
      */
     fun supportsFeature(feature: ModelFeature): Boolean {
-        return _currentConfig.value?.modelType?.features?.contains(feature) == true
+        val providerType = _currentConfig.value?.providerType ?: return false
+
+        return when (feature) {
+            ModelFeature.LONG_CONTEXT -> {
+                // GLM CodePlan支持长上下文
+                providerType == ModelProviderType.GLM_CODEPLAN
+            }
+            ModelFeature.STREAMING -> {
+                // 所有提供商都支持流式输出
+                true
+            }
+            ModelFeature.FUNCTION_CALLING -> {
+                // GLM CodePlan支持函数调用
+                providerType == ModelProviderType.GLM_CODEPLAN
+            }
+            ModelFeature.VISION -> {
+                // 暂不支持视觉
+                false
+            }
+            ModelFeature.CODE_GENERATION -> {
+                // 所有提供商都支持代码生成
+                true
+            }
+        }
     }
+}
+
+/**
+ * 模型特性枚举
+ */
+enum class ModelFeature(val displayName: String) {
+    LONG_CONTEXT("长文本支持"),
+    STREAMING("流式输出"),
+    FUNCTION_CALLING("函数调用"),
+    VISION("图像理解"),
+    CODE_GENERATION("代码生成")
 }
 
 /**

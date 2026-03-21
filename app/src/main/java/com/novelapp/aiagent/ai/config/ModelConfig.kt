@@ -8,7 +8,8 @@ import kotlinx.serialization.SerialName
  *
  * 支持动态配置不同的AI模型，便于后期扩展
  *
- * @property modelType 模型类型
+ * @property providerType 模型提供商类型
+ * @property glmModel GLM模型类型（当providerType为GLM_CODEPLAN时使用）
  * @property apiKey API密钥
  * @property baseUrl API基础URL
  * @property modelName 模型名称
@@ -17,8 +18,11 @@ import kotlinx.serialization.SerialName
  */
 @Serializable
 data class ModelConfig(
-    @SerialName("model_type")
-    val modelType: ModelType,
+    @SerialName("provider_type")
+    val providerType: ModelProviderType,
+
+    @SerialName("glm_model")
+    val glmModel: GLMModel? = null,
 
     @SerialName("api_key")
     val apiKey: String,
@@ -64,61 +68,79 @@ data class ModelConfig(
      * 获取模型显示名称
      */
     fun getDisplayName(): String {
-        return modelType.displayName
+        return glmModel?.displayName ?: providerType.displayName
+    }
+
+    companion object {
+        /**
+         * 创建GLM配置
+         */
+        fun createGLMConfig(
+            glmModel: GLMModel,
+            apiKey: String
+        ): ModelConfig {
+            return ModelConfig(
+                providerType = ModelProviderType.GLM_CODEPLAN,
+                glmModel = glmModel,
+                apiKey = apiKey,
+                baseUrl = ModelProviderType.GLM_CODEPLAN.defaultBaseUrl,
+                modelName = glmModel.modelId
+            )
+        }
     }
 }
 
 /**
- * 支持的模型类型
+ * 模型提供商类型
  *
- * 后期可扩展添加新的模型类型
+ * 后期可扩展添加新的提供商
  */
 @Serializable
-enum class ModelType(
+enum class ModelProviderType(
     val id: String,
     val displayName: String,
     val defaultBaseUrl: String,
-    val defaultModelName: String,
     val description: String,
-    val features: Set<ModelFeature>
+    val supportedModels: List<ModelInfo>
 ) {
     /**
-     * GLM CodePlan模型
+     * GLM CodePlan
      *
-     * 支持长文本生成，适合小说创作
+     * 智谱AI代码助手API，支持多种GLM模型
      */
     @SerialName("glm_codeplan")
     GLM_CODEPLAN(
         id = "glm_codeplan",
         displayName = "GLM CodePlan",
-        defaultBaseUrl = "https://open.bigmodel.cn/api/paas/v4",
-        defaultModelName = "glm-4-plus",
-        description = "智谱AI GLM-4模型，支持长文本创作",
-        features = setOf(
-            ModelFeature.LONG_CONTEXT,
-            ModelFeature.STREAMING,
-            ModelFeature.FUNCTION_CALLING
-        )
+        defaultBaseUrl = "https://open.bigmodel.cn/api/coding/paas/v4",
+        description = "智谱AI GLM系列模型，支持小说创作",
+        supportedModels = GLMModel.entries.map { model ->
+            ModelInfo(
+                id = model.modelId,
+                displayName = model.displayName,
+                description = model.description
+            )
+        }
     );
 
     /**
-     * 根据ID获取模型类型
+     * 根据ID获取提供商类型
      */
     companion object {
-        fun fromId(id: String): ModelType? {
+        fun fromId(id: String): ModelProviderType? {
             return entries.find { it.id == id }
         }
 
         /**
-         * 获取所有支持的模型类型（用于UI展示）
+         * 获取所有支持的提供商（用于UI展示）
          */
-        fun getSupportedModels(): List<ModelTypeInfo> {
-            return entries.map { type ->
-                ModelTypeInfo(
-                    id = type.id,
-                    displayName = type.displayName,
-                    description = type.description,
-                    features = type.features.map { it.displayName }
+        fun getSupportedProviders(): List<ProviderInfo> {
+            return entries.map { provider ->
+                ProviderInfo(
+                    id = provider.id,
+                    displayName = provider.displayName,
+                    description = provider.description,
+                    models = provider.supportedModels
                 )
             }
         }
@@ -126,31 +148,97 @@ enum class ModelType(
 }
 
 /**
- * 模型特性
+ * GLM模型类型
+ *
+ * 支持的GLM模型列表
  */
 @Serializable
-enum class ModelFeature(val displayName: String) {
-    @SerialName("long_context")
-    LONG_CONTEXT("长文本支持"),
+enum class GLMModel(
+    val modelId: String,
+    val displayName: String,
+    val description: String,
+    val maxTokens: Int = 4096,
+    val recommendedTemperature: Float = 0.7f
+) {
+    @SerialName("glm_5")
+    GLM_5(
+        modelId = "GLM-5",
+        displayName = "GLM 5",
+        description = "最新一代GLM模型，性能最强",
+        maxTokens = 8192,
+        recommendedTemperature = 0.7f
+    ),
 
-    @SerialName("streaming")
-    STREAMING("流式输出"),
+    @SerialName("glm_4_7")
+    GLM_4_7(
+        modelId = "GLM-4.7",
+        displayName = "GLM 4.7",
+        description = "高性能模型，平衡效果与速度",
+        maxTokens = 4096,
+        recommendedTemperature = 0.7f
+    ),
 
-    @SerialName("function_calling")
-    FUNCTION_CALLING("函数调用"),
+    @SerialName("glm_4_6")
+    GLM_4_6(
+        modelId = "GLM-4.6",
+        displayName = "GLM 4.6",
+        description = "稳定版本，适合长文本创作",
+        maxTokens = 4096,
+        recommendedTemperature = 0.8f
+    ),
 
-    @SerialName("vision")
-    VISION("图像理解"),
+    @SerialName("glm_4_5_air")
+    GLM_4_5_AIR(
+        modelId = "GLM-4.5-air",
+        displayName = "GLM 4.5 air",
+        description = "轻量级模型，响应速度快",
+        maxTokens = 2048,
+        recommendedTemperature = 0.7f
+    );
 
-    @SerialName("code_generation")
-    CODE_GENERATION("代码生成");
+    /**
+     * 根据模型ID获取模型
+     */
+    companion object {
+        fun fromModelId(modelId: String): GLMModel? {
+            return entries.find { it.modelId == modelId }
+        }
+
+        /**
+         * 获取所有模型（用于UI展示）
+         */
+        fun getAllModels(): List<ModelInfo> {
+            return entries.map { model ->
+                ModelInfo(
+                    id = model.modelId,
+                    displayName = model.displayName,
+                    description = model.description
+                )
+            }
+        }
+    }
 }
 
 /**
- * 模型类型信息（用于UI展示）
+ * 模型信息（用于UI展示）
  */
 @Serializable
-data class ModelTypeInfo(
+data class ModelInfo(
+    @SerialName("id")
+    val id: String,
+
+    @SerialName("display_name")
+    val displayName: String,
+
+    @SerialName("description")
+    val description: String
+)
+
+/**
+ * 提供商信息（用于UI展示）
+ */
+@Serializable
+data class ProviderInfo(
     @SerialName("id")
     val id: String,
 
@@ -160,37 +248,44 @@ data class ModelTypeInfo(
     @SerialName("description")
     val description: String,
 
-    @SerialName("features")
-    val features: List<String>
+    @SerialName("models")
+    val models: List<ModelInfo>
 )
 
 /**
  * 登录配置（用于登录时选择模型）
+ *
+ * 登录流程：
+ * 1. 选择模型方案（ModelProviderType）
+ * 2. 选择模型类型（GLMModel）
+ * 3. 输入API Key
  */
 @Serializable
 data class LoginConfig(
-    @SerialName("model_type")
-    val modelType: ModelType,
+    @SerialName("provider_type")
+    val providerType: ModelProviderType,
+
+    @SerialName("glm_model")
+    val glmModel: GLMModel? = null,
 
     @SerialName("api_key")
     val apiKey: String,
 
     @SerialName("custom_base_url")
-    val customBaseUrl: String? = null,  // 可选自定义URL
-
-    @SerialName("custom_model_name")
-    val customModelName: String? = null  // 可选自定义模型名
+    val customBaseUrl: String? = null
 ) {
     /**
      * 转换为完整的ModelConfig
      */
     fun toModelConfig(): ModelConfig {
-        return ModelConfig(
-            modelType = modelType,
-            apiKey = apiKey,
-            baseUrl = customBaseUrl ?: modelType.defaultBaseUrl,
-            modelName = customModelName ?: modelType.defaultModelName
-        )
+        return when (providerType) {
+            ModelProviderType.GLM_CODEPLAN -> {
+                ModelConfig.createGLMConfig(
+                    glmModel = glmModel ?: GLMModel.GLM_4_6,
+                    apiKey = apiKey
+                )
+            }
+        }
     }
 
     /**
@@ -199,6 +294,7 @@ data class LoginConfig(
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()
 
+        // 验证API Key
         if (apiKey.isBlank()) {
             errors.add("API密钥不能为空")
         }
@@ -207,6 +303,12 @@ data class LoginConfig(
             errors.add("API密钥格式不正确")
         }
 
+        // 验证GLM模型选择
+        if (providerType == ModelProviderType.GLM_CODEPLAN && glmModel == null) {
+            errors.add("请选择模型类型")
+        }
+
+        // 验证自定义URL
         customBaseUrl?.let { url ->
             if (url.isNotBlank() && !url.startsWith("https://")) {
                 errors.add("API地址必须使用HTTPS")

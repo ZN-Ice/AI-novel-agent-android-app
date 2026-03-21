@@ -1,7 +1,8 @@
 package com.novelapp.aiagent.ai.providers
 
 import com.novelapp.aiagent.ai.config.ModelConfig
-import com.novelapp.aiagent.ai.config.ModelType
+import com.novelapp.aiagent.ai.config.ModelProviderType
+import com.novelapp.aiagent.ai.config.GLMModel
 import com.novelapp.aiagent.model.AIRequest
 import com.novelapp.aiagent.model.AIResponse
 import com.novelapp.aiagent.model.AIResult
@@ -29,14 +30,14 @@ interface AIProvider {
     val providerId: String
 
     /**
-     * 支持的模型类型
+     * 支持的提供商类型
      */
-    val supportedModels: Set<ModelType>
+    val supportedProviderTypes: Set<ModelProviderType>
 
     /**
-     * 检查是否支持指定模型
+     * 检查是否支持指定提供商
      */
-    fun supports(modelType: ModelType): Boolean
+    fun supports(providerType: ModelProviderType): Boolean
 
     /**
      * 生成内容
@@ -52,7 +53,7 @@ interface AIProvider {
 /**
  * GLM Provider实现
  *
- * 支持GLM系列模型（GLM-4, GLM-4-Plus等）
+ * 支持GLM系列模型（GLM-5, GLM-4.7, GLM-4.6, GLM-4.5-air）
  */
 class GLMProvider : AIProvider {
 
@@ -70,7 +71,7 @@ class GLMProvider : AIProvider {
 
     override val providerId: String = "glm"
 
-    override val supportedModels: Set<ModelType> = setOf(ModelType.GLM_CODEPLAN)
+    override val supportedProviderTypes: Set<ModelProviderType> = setOf(ModelProviderType.GLM_CODEPLAN)
 
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -80,8 +81,8 @@ class GLMProvider : AIProvider {
             .build()
     }
 
-    override fun supports(modelType: ModelType): Boolean {
-        return modelType in supportedModels
+    override fun supports(providerType: ModelProviderType): Boolean {
+        return providerType in supportedProviderTypes
     }
 
     override suspend fun generate(config: ModelConfig, request: AIRequest): AIResult<AIResponse> =
@@ -129,6 +130,9 @@ class GLMProvider : AIProvider {
      * 构建GLM请求体
      */
     private fun buildGLMRequestBody(config: ModelConfig, request: AIRequest): String {
+        // 根据模型配置获取温度参数
+        val temperature = config.glmModel?.recommendedTemperature ?: config.temperature
+
         return buildString {
             append("{")
             append("\"model\":\"${config.modelName}\",")
@@ -140,7 +144,7 @@ class GLMProvider : AIProvider {
                 append("\"prompt\":\"${escapeJson(request.instruction)}\",")
             }
             append("\"max_tokens\":${request.maxTokens},")
-            append("\"temperature\":${config.temperature},")
+            append("\"temperature\":$temperature,")
             append("\"stream\":false")
             append("}")
         }
@@ -219,7 +223,7 @@ class GLMProvider : AIProvider {
 /**
  * AI Provider工厂
  *
- * 根据模型类型创建对应的Provider
+ * 根据提供商类型创建对应的Provider
  */
 object AIProviderFactory {
 
@@ -241,17 +245,17 @@ object AIProviderFactory {
     /**
      * 获取Provider
      *
-     * @param modelType 模型类型
+     * @param providerType 提供商类型
      * @return 对应的Provider，找不到返回null
      */
-    fun getProvider(modelType: ModelType): AIProvider? {
-        return providers.values.find { it.supports(modelType) }
+    fun getProvider(providerType: ModelProviderType): AIProvider? {
+        return providers.values.find { it.supports(providerType) }
     }
 
     /**
-     * 获取所有支持的模型类型
+     * 获取所有支持的提供商类型
      */
-    fun getSupportedModels(): List<ModelType> {
-        return providers.values.flatMap { it.supportedModels }.distinct()
+    fun getSupportedProviderTypes(): List<ModelProviderType> {
+        return providers.values.flatMap { it.supportedProviderTypes }.distinct()
     }
 }

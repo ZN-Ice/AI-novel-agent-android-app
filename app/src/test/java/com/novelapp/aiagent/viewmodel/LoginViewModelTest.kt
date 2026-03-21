@@ -1,7 +1,6 @@
 package com.novelapp.aiagent.viewmodel
 
 import org.junit.Assert.*
-import org.junit.Test
 
 /**
  * LoginViewModel单元测试
@@ -10,7 +9,7 @@ class LoginViewModelTest {
 
     // ==================== LoginUiState测试 ====================
 
-    @Test
+    @org.junit.Test
     fun `LoginUiState Idle isLoading is false`() {
         val state = LoginUiState.Idle
 
@@ -20,7 +19,7 @@ class LoginViewModelTest {
         assertFalse(state.isAlreadyLoggedIn)
     }
 
-    @Test
+    @org.junit.Test
     fun `LoginUiState Loading isLoading is true`() {
         val state = LoginUiState.Loading
 
@@ -29,14 +28,14 @@ class LoginViewModelTest {
         assertFalse(state.isError)
     }
 
-    @Test
+    @org.junit.Test
     fun `LoginUiState Success isSuccess is true`() {
         val state = LoginUiState.Success(
             com.novelapp.aiagent.ai.config.ModelConfig(
-                modelType = com.novelapp.aiagent.ai.config.ModelType.GLM_CODEPLAN,
+                providerType = com.novelapp.aiagent.ai.config.ModelProviderType.GLM_CODEPLAN,
                 apiKey = "test-key",
-                baseUrl = "https://api.example.com",
-                modelName = "glm-4-plus"
+                baseUrl = "https://open.bigmodel.cn/api/coding/paas/v4",
+                modelName = "GLM-4.6"
             )
         )
 
@@ -45,7 +44,7 @@ class LoginViewModelTest {
         assertFalse(state.isError)
     }
 
-    @Test
+    @org.junit.Test
     fun `LoginUiState Error isError is true`() {
         val state = LoginUiState.Error("登录失败")
 
@@ -54,14 +53,14 @@ class LoginViewModelTest {
         assertTrue(state.isError)
     }
 
-    @Test
+    @org.junit.Test
     fun `LoginUiState AlreadyLoggedIn isAlreadyLoggedIn is true`() {
         val state = LoginUiState.AlreadyLoggedIn(
             com.novelapp.aiagent.ai.config.ModelConfig(
-                modelType = com.novelapp.aiagent.ai.config.ModelType.GLM_CODEPLAN,
+                providerType = com.novelapp.aiagent.ai.config.ModelProviderType.GLM_CODEPLAN,
                 apiKey = "test-key",
-                baseUrl = "https://api.example.com",
-                modelName = "glm-4-plus"
+                baseUrl = "https://open.bigmodel.cn/api/coding/paas/v4",
+                modelName = "GLM-4.6"
             )
         )
 
@@ -73,7 +72,7 @@ class LoginViewModelTest {
 
     // ==================== FormValidation测试 ====================
 
-    @Test
+    @org.junit.Test
     fun `FormValidation Valid isValid is true`() {
         val validation = FormValidation.Valid
 
@@ -81,7 +80,7 @@ class LoginViewModelTest {
         assertFalse(validation.isInvalid)
     }
 
-    @Test
+    @org.junit.Test
     fun `FormValidation Invalid isInvalid is true`() {
         val validation = FormValidation.Invalid(listOf("错误1", "错误2"))
 
@@ -90,14 +89,14 @@ class LoginViewModelTest {
         assertEquals("错误1", validation.firstError)
     }
 
-    @Test
+    @org.junit.Test
     fun `FormValidation Invalid firstError returns first message`() {
         val validation = FormValidation.Invalid(listOf("错误A", "错误B"))
 
         assertEquals("错误A", validation.firstError)
     }
 
-    @Test
+    @org.junit.Test
     fun `FormValidation Invalid empty list returns default message`() {
         val validation = FormValidation.Invalid(emptyList())
 
