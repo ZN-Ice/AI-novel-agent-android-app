@@ -1,0 +1,376 @@
+# AI小说安卓App - CI/CD门禁
+# 在推送和PR合入前触发，执行lint和测试检查
+#
+# 门禁检查项：
+# 1. 构建测试 - 验证代码能否编译
+# 2. Lint检查 - 代码规范与安全
+# 3. 单元测试 - 业务逻辑验证
+# 4. UI测试 - 界面交互验证（仅main分支）
+#
+# @see AGENTS.md 9.4 GitHub Actions门禁规范
+
+name: Android CI Gate
+
+on:
+  push:
+    branches: [ main, develop, 'release/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+# 并发控制：同一分支的多个workflow只保留最新的
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true"
+  JAVA_VERSION: '17'
+  JAVA_DISTRIBUTION: 'temurin'
+
+jobs:
+  # ==================== 构建测试 ====================
+  build:
+    name: 构建测试
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史用于版本号计算
+
+      - name: 设置JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: 设置Gradle缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 授予执行权限
+        run: chmod +x gradlew
+
+      - name: 构建Debug包
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+
+  # ==================== Lint检查 ====================
+  lint:
+    name: Lint检查
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: 设置Gradle缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 授予执行权限
+        run: chmod +x gradlew
+
+      - name: 运行Lint检查
+        run: ./gradlew lint --stacktrace
+
+      - name: 上传Lint报告
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results*.html
+          retention-days: 14
+
+      - name: Lint检查结果
+        run: |
+          if [ -f app/build/reports/lint-results-debug.xml ]; then
+            # 检查是否有error级别的issue
+            ERRORS=$(grep -c 'severity="Error"' app/build/reports/lint-results-debug.xml || echo "0")
+            if [ "$ERRORS" -gt 0 ]; then
+              echo "::error::发现 $ERRORS 个Lint错误，请修复后重新提交"
+              exit 1
+            fi
+            echo "::notice::Lint检查通过"
+          fi
+
+  # ==================== 单元测试 ====================
+  unit-test:
+    name: 单元测试
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: 设置Gradle缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 授予执行权限
+        run: chmod +x gradlew
+
+      - name: 运行单元测试
+        run: ./gradlew test --stacktrace
+
+      - name: 上传测试报告
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-report
+          path: |
+            app/build/reports/tests/
+            app/build/test-results/
+          retention-days: 14
+
+      - name: 测试覆盖率检查
+        run: |
+          # 检查测试是否全部通过
+          if [ -f app/build/test-results/testDebugUnitTest/TEST-*.xml ]; then
+            FAILURES=$(grep -c 'failures="[1-9]' app/build/test-results/testDebugUnitTest/TEST-*.xml || echo "0")
+            if [ "$FAILURES" -gt 0 ]; then
+              echo "::error::发现 $FAILURES 个测试失败，请修复后重新提交"
+              exit 1
+            fi
+            echo "::notice::单元测试通过"
+          fi
+
+  # ==================== 安全检查 ====================
+  security:
+    name: 安全检查
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 5
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 检查硬编码密钥
+        run: |
+          echo "检查硬编码API密钥..."
+          if grep -rE "(api[_-]?key|apikey|secret|password|token)\s*[=:]\s*['\"][^'\"]{10,}['\"]" \
+            --include="*.kt" --include="*.java" --include="*.xml" \
+            --exclude-dir=".gradle" --exclude-dir="build" .; then
+            echo "::error::发现硬编码的密钥，请使用环境变量或加密存储"
+            exit 1
+          fi
+          echo "::notice::未发现硬编码密钥"
+
+      - name: 检查敏感文件
+        run: |
+          echo "检查敏感文件..."
+          SENSITIVE_FILES=(
+            ".env"
+            "*.pem"
+            "*.key"
+            "secrets.properties"
+            "local.properties"
+            "google-services.json"
+          )
+
+          for file in "${SENSITIVE_FILES[@]}"; do
+            if ls $file 2>/dev/null | grep -q .; then
+              echo "::error::发现敏感文件: $file，请添加到.gitignore"
+              exit 1
+            fi
+          done
+          echo "::notice::未发现敏感文件"
+
+  # ==================== UI测试（仅main分支） ====================
+  ui-test:
+    name: UI测试
+    runs-on: ubuntu-latest
+    needs: [lint, unit-test]
+    # 只在main分支或release分支上运行UI测试
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: true
+      matrix:
+        api-level: [30]  # Android 11
+        target: [google_apis]
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: 设置Gradle缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 授予执行权限
+        run: chmod +x gradlew
+
+      - name: 启用AVD缓存
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}-${{ matrix.target }}
+
+      - name: 创建AVD并生成快照
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: 运行UI测试
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedAndroidTest --stacktrace
+
+      - name: 上传UI测试报告
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-test-report
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+          retention-days: 14
+
+  # ==================== 门禁结果 ====================
+  gate-result:
+    name: 门禁结果
+    runs-on: ubuntu-latest
+    needs: [build, lint, unit-test, security]
+    if: always()
+
+    steps:
+      - name: 检查门禁结果
+        run: |
+          echo "============================================"
+          echo "  GitHub Actions 门禁结果"
+          echo "============================================"
+          echo ""
+
+          # 检查所有job状态
+          BUILD_RESULT="${{ needs.build.result }}"
+          LINT_RESULT="${{ needs.lint.result }}"
+          TEST_RESULT="${{ needs.unit-test.result }}"
+          SECURITY_RESULT="${{ needs.security.result }}"
+
+          echo "| 检查项 | 状态 |"
+          echo "|-------|------|"
+          echo "| 构建 | $BUILD_RESULT |"
+          echo "| Lint | $LINT_RESULT |"
+          echo "| 单元测试 | $TEST_RESULT |"
+          echo "| 安全检查 | $SECURITY_RESULT |"
+          echo ""
+
+          # 判断是否全部通过
+          if [[ "$BUILD_RESULT" == "success" && \
+                "$LINT_RESULT" == "success" && \
+                "$TEST_RESULT" == "success" && \
+                "$SECURITY_RESULT" == "success" ]]; then
+            echo "✅ 所有门禁检查通过！"
+            exit 0
+          else
+            echo "❌ 门禁检查未通过，请修复上述问题"
+            exit 1
+          fi
+
+      - name: 输出PR评论
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildResult = '${{ needs.build.result }}';
+            const lintResult = '${{ needs.lint.result }}';
+            const testResult = '${{ needs.unit-test.result }}';
+            const securityResult = '${{ needs.security.result }}';
+
+            const statusEmoji = (status) => status === 'success' ? '✅' : '❌';
+
+            const body = `## 🔒 门禁检查结果
+
+            | 检查项 | 状态 |
+            |-------|------|
+            | 构建 | ${statusEmoji(buildResult)} ${buildResult} |
+            | Lint | ${statusEmoji(lintResult)} ${lintResult} |
+            | 单元测试 | ${statusEmoji(testResult)} ${testResult} |
+            | 安全检查 | ${statusEmoji(securityResult)} ${securityResult} |
+
+            ${buildResult === 'success' && lintResult === 'success' && testResult === 'success' && securityResult === 'success'
+              ? '### ✅ 所有检查通过，可以合入'
+              : '### ❌ 存在未通过的检查，请修复后重新提交'}
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

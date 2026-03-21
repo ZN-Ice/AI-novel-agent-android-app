@@ -820,50 +820,150 @@ echo "现在可以执行 git commit 和 git push"
 
 > **注意**：豁免仅用于特殊情况，常规开发必须完成全部检查。
 
-#### 9.3.5 CI/CD集成（推荐）
+---
+
+## 9.4 GitHub Actions门禁规范
+
+### 9.4.1 门禁触发条件
+
+| 事件 | 触发分支 | 说明 |
+|------|---------|------|
+| `push` | main, develop, release/** | 推送代码时触发 |
+| `pull_request` | main, develop | PR创建/更新时触发 |
+
+### 9.4.2 门禁检查项
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    GitHub Actions 门禁流程                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+     ┌──────────────┐
+     │  push / PR   │
+     └──────┬───────┘
+            │
+            ▼
+     ┌──────────────┐
+     │  构建测试    │ ──> 失败 → ❌ 阻断
+     │  assemble    │
+     └──────┬───────┘
+            │ 通过
+            ▼
+     ┌──────────────┐
+     │  Lint检查    │ ──> 失败 → ❌ 阻断
+     │  lint        │
+     └──────┬───────┘
+            │ 通过
+            ▼
+     ┌──────────────┐
+     │  单元测试    │ ──> 失败 → ❌ 阻断
+     │  test        │
+     └──────┬───────┘
+            │ 通过
+            ▼
+     ┌──────────────┐
+     │  安全检查    │ ──> 失败 → ❌ 阻断
+     │  硬编码检测  │
+     └──────┬───────┘
+            │ 通过
+            ▼
+     ┌──────────────┐
+     │  UI测试      │ ──> 仅main/release分支
+     │ (条件执行)   │
+     └──────┬───────┘
+            │
+            ▼
+     ┌──────────────┐
+     │  ✅ 门禁通过  │
+     └──────────────┘
+```
+
+### 9.4.3 检查项详细说明
+
+| 检查项 | 命令 | 超时 | 失败处理 |
+|-------|------|------|---------|
+| 构建 | `./gradlew assembleDebug` | 15分钟 | 查看构建日志修复编译错误 |
+| Lint | `./gradlew lint` | 10分钟 | 查看lint报告修复规范问题 |
+| 单元测试 | `./gradlew test` | 15分钟 | 查看测试报告修复失败用例 |
+| 安全检查 | 自定义脚本 | 5分钟 | 移除硬编码密钥 |
+| UI测试 | `./gradlew connectedAndroidTest` | 45分钟 | 仅main分支运行 |
+
+### 9.4.4 并发控制
+
+- 同一分支的多个workflow只保留最新的
+- 新的提交会自动取消之前正在运行的workflow
+- 避免资源浪费和重复执行
+
+### 9.4.5 缓存策略
+
+| 缓存项 | 路径 | Key |
+|-------|------|-----|
+| Gradle缓存 | `~/.gradle/caches` | 基于gradle文件hash |
+| Gradle Wrapper | `~/.gradle/wrapper` | 基于gradle文件hash |
+| AVD缓存 | `~/.android/avd/*` | 基于API级别 |
+
+### 9.4.6 产物保留
+
+| 产物 | 保留天数 | 用途 |
+|-----|---------|------|
+| Debug APK | 7天 | 测试安装包 |
+| Lint报告 | 14天 | 代码规范问题排查 |
+| 测试报告 | 14天 | 测试失败分析 |
+| UI测试报告 | 14天 | UI测试问题排查 |
+
+### 9.4.7 门禁豁免
+
+以下情况可跳过部分门禁（不推荐，仅紧急情况使用）：
 
 ```yaml
-# .github/workflows/android.yml 示例
-name: Android CI
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: Run Lint
-      run: ./gradlew lint
-
-    - name: Run Unit Tests
-      run: ./gradlew test
-
-    - name: Run UI Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 30
-        script: ./gradlew connectedAndroidTest
-
-    - name: Upload Reports
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: test-reports
-        path: app/build/reports/
+# 在commit message中添加标记
+git commit -m "fix: 紧急修复 [skip-ci]"     # 跳过所有CI
+git commit -m "docs: 更新文档 [skip-test]"  # 跳过测试
 ```
+
+> **警告**：豁免标记仅用于紧急情况，滥用将被记录并审查。
+
+### 9.4.8 PR评论自动通知
+
+门禁完成后会自动在PR中添加评论：
+
+```
+## 🔒 门禁检查结果
+
+| 检查项 | 状态 |
+|-------|------|
+| 构建 | ✅ success |
+| Lint | ✅ success |
+| 单元测试 | ✅ success |
+| 安全检查 | ✅ success |
+
+### ✅ 所有检查通过，可以合入
+```
+
+### 9.4.9 本地预检
+
+在推送前建议本地执行：
+
+```bash
+# 完整预检（推荐）
+./gradlew assembleDebug lint test
+
+# 快速预检（仅构建和lint）
+./gradlew assembleDebug lint
+
+# 使用项目脚本
+bash scripts/check.sh
+```
+
+### 9.4.10 配置文件位置
+
+```
+.github/
+└── workflows/
+    └── ci.yml          # 主CI配置
+```
+
+**配置文件路径**: `.github/workflows/ci.yml`
 
 ---
 
@@ -1585,7 +1685,7 @@ class CreateNovelUseCaseTest {
 
 ---
 
-**版本**：v1.3.0
+**版本**：v1.4.0
 **更新日期**：2026-03-21
 **维护者**：AI小说安卓App研发团队
 
@@ -1593,6 +1693,7 @@ class CreateNovelUseCaseTest {
 
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
+| v1.4.0 | 2026-03-21 | 新增GitHub Actions门禁规范（9.4节），包含构建/Lint/测试/安全检查 |
 | v1.3.0 | 2026-03-21 | 核心流程增加构建测试步骤（build → lint → test → push） |
 | v1.2.0 | 2026-03-21 | 新增核心开发流程（9.3节），强制lint+test+push流程 |
 | v1.1.0 | 2026-03-21 | 新增测试规范章节（单元测试、UI测试、E2E测试） |
