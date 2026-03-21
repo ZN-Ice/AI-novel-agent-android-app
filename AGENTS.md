@@ -1084,6 +1084,72 @@ bash scripts/check.sh
 
 **配置文件路径**: `.github/workflows/ci.yml`
 
+### 9.4.12 门禁失败排查方法
+
+当GitHub Actions门禁失败时，可使用`gh` CLI工具快速定位问题。
+
+#### 查看失败的workflow列表
+
+```bash
+# 查看最近5次失败的workflow
+gh run list --status failed --limit 5
+
+# 输出示例：
+# completed  failure  feat: xxx  Android CI Gate  feat/xxx  pull_request  12345678  1m30s  2026-03-21
+```
+
+#### 查看指定运行的详细日志
+
+```bash
+# 查看指定run的完整日志
+gh run view {RUN_ID} --log
+
+# 查看日志末尾（快速定位错误）
+gh run view {RUN_ID} --log 2>&1 | tail -200
+
+# 搜索关键错误信息
+gh run view {RUN_ID} --log 2>&1 | grep -A 10 "Caused by"
+gh run view {RUN_ID} --log 2>&1 | grep -A 10 "BUILD FAILED"
+gh run view {RUN_ID} --log 2>&1 | grep -A 10 "Could not find"
+```
+
+#### 常见错误类型与解决
+
+| 错误关键词 | 可能原因 | 解决方案 |
+|-----------|---------|---------|
+| `Could not find` | 依赖找不到 | 检查仓库配置、包名版本 |
+| `BUILD FAILED` | 编译错误 | 检查代码语法、类型匹配 |
+| `RepositoriesMode` | 仓库配置冲突 | 统一在settings.gradle.kts配置 |
+| `Permission denied` | 权限不足 | 检查文件权限、workflow配置 |
+| `Timeout` | 超时 | 优化构建配置、增加超时时间 |
+
+#### 完整排查流程
+
+```bash
+# Step 1: 查看失败的workflow
+gh run list --status failed --limit 5
+
+# Step 2: 获取最新的失败run ID
+RUN_ID=$(gh run list --status failed --limit 1 --json databaseId --jq '.[0].databaseId')
+
+# Step 3: 查看错误详情
+gh run view $RUN_ID --log 2>&1 | grep -E "(FAILURE|Caused by|error:)" -A 5
+
+# Step 4: 本地复现问题
+./gradlew assembleDebug lint test
+
+# Step 5: 修复后推送
+git add . && git commit -m "fix: 修复xxx问题"
+git push
+```
+
+#### Web界面查看
+
+也可以直接访问GitHub Actions页面：
+```
+https://github.com/{OWNER}/{REPO}/actions
+```
+
 ---
 
 ## 十、测试规范
@@ -1804,7 +1870,7 @@ class CreateNovelUseCaseTest {
 
 ---
 
-**版本**：v1.5.0
+**版本**：v1.5.1
 **更新日期**：2026-03-21
 **维护者**：AI小说安卓App研发团队
 
@@ -1812,6 +1878,7 @@ class CreateNovelUseCaseTest {
 
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
+| v1.5.1 | 2026-03-21 | 新增9.4.12节门禁失败排查方法（gh CLI使用） |
 | v1.5.0 | 2026-03-21 | 核心流程改为PR模式，新增AI代码审查（reviewdog + GLM Code Plan） |
 | v1.4.0 | 2026-03-21 | 新增GitHub Actions门禁规范（9.4节），包含构建/Lint/测试/安全检查 |
 | v1.3.0 | 2026-03-21 | 核心流程增加构建测试步骤（build → lint → test → push） |
