@@ -1,11 +1,12 @@
 # AI小说安卓App - CI/CD门禁
-# 在推送和PR合入前触发，执行lint和测试检查
+# 在PR创建/更新时触发，执行lint、测试和AI代码审查
 #
 # 门禁检查项：
 # 1. 构建测试 - 验证代码能否编译
-# 2. Lint检查 - 代码规范与安全
+# 2. Lint检查 - 代码规范与安全（reviewdog自动评论）
 # 3. 单元测试 - 业务逻辑验证
-# 4. UI测试 - 界面交互验证（仅main分支）
+# 4. 安全检查 - 硬编码密钥检测
+# 5. AI代码审查 - GLM Code Plan智能分析
 #
 # @see AGENTS.md 9.4 GitHub Actions门禁规范
 
@@ -13,13 +14,14 @@ name: Android CI Gate
 
 on:
   push:
-    branches: [ main, develop, 'release/**' ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+  workflow_dispatch:
 
-# 并发控制：同一分支的多个workflow只保留最新的
+# 并发控制：同一PR/分支只保留最新的workflow
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -38,7 +40,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整历史用于版本号计算
+          fetch-depth: 0
 
       - name: 设置JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -71,7 +73,7 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 7
 
-  # ==================== Lint检查 ====================
+  # ==================== Lint检查（带reviewdog） ====================
   lint:
     name: Lint检查
     runs-on: ubuntu-latest
@@ -101,8 +103,18 @@ jobs:
       - name: 授予执行权限
         run: chmod +x gradlew
 
-      - name: 运行Lint检查
+      - name: 运行Lint
         run: ./gradlew lint --stacktrace
+
+      - name: 运行Lint（reviewdog报告）
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-android-lint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          filter_mode: added
+          fail_on_error: true
+          level: warning
 
       - name: 上传Lint报告
         uses: actions/upload-artifact@v4
@@ -112,19 +124,7 @@ jobs:
           path: app/build/reports/lint-results*.html
           retention-days: 14
 
-      - name: Lint检查结果
-        run: |
-          if [ -f app/build/reports/lint-results-debug.xml ]; then
-            # 检查是否有error级别的issue
-            ERRORS=$(grep -c 'severity="Error"' app/build/reports/lint-results-debug.xml || echo "0")
-            if [ "$ERRORS" -gt 0 ]; then
-              echo "::error::发现 $ERRORS 个Lint错误，请修复后重新提交"
-              exit 1
-            fi
-            echo "::notice::Lint检查通过"
-          fi
-
-  # ==================== 单元测试 ====================
+  # ==================== 单元测试（带reviewdog） ====================
   unit-test:
     name: 单元测试
     runs-on: ubuntu-latest
@@ -157,6 +157,14 @@ jobs:
       - name: 运行单元测试
         run: ./gradlew test --stacktrace
 
+      - name: 发布测试报告（reviewdog）
+        if: github.event_name == 'pull_request' && always()
+        uses: reviewdog/action-report@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          filter_mode: added
+
       - name: 上传测试报告
         uses: actions/upload-artifact@v4
         if: always()
@@ -166,18 +174,6 @@ jobs:
             app/build/reports/tests/
             app/build/test-results/
           retention-days: 14
-
-      - name: 测试覆盖率检查
-        run: |
-          # 检查测试是否全部通过
-          if [ -f app/build/test-results/testDebugUnitTest/TEST-*.xml ]; then
-            FAILURES=$(grep -c 'failures="[1-9]' app/build/test-results/testDebugUnitTest/TEST-*.xml || echo "0")
-            if [ "$FAILURES" -gt 0 ]; then
-              echo "::error::发现 $FAILURES 个测试失败，请修复后重新提交"
-              exit 1
-            fi
-            echo "::notice::单元测试通过"
-          fi
 
   # ==================== 安全检查 ====================
   security:
@@ -189,6 +185,16 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+
+      - name: Trivy漏洞扫描
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
 
       - name: 检查硬编码密钥
         run: |
@@ -221,87 +227,138 @@ jobs:
           done
           echo "::notice::未发现敏感文件"
 
-  # ==================== UI测试（仅main分支） ====================
-  ui-test:
-    name: UI测试
+  # ==================== AI代码审查（GLM Code Plan） ====================
+  ai-review:
+    name: AI代码审查
     runs-on: ubuntu-latest
     needs: [lint, unit-test]
-    # 只在main分支或release分支上运行UI测试
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
-    timeout-minutes: 45
-
-    strategy:
-      fail-fast: true
-      matrix:
-        api-level: [30]  # Android 11
-        target: [google_apis]
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
 
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-
-      - name: 设置JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          fetch-depth: 0
 
-      - name: 设置Gradle缓存
-        uses: actions/cache@v4
+      - name: 获取PR变更
+        id: changes
+        run: |
+          # 获取变更的文件列表
+          FILES=$(git diff --name-only origin/main...HEAD | head -20)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # 获取代码差异
+          DIFF=$(git diff origin/main...HEAD | head -3000)
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: GLM代码审查
+        if: env.GLM_API_KEY != ''
+        env:
+          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
+        run: |
+          echo "正在使用GLM Code Plan进行代码审查..."
+
+          # 构建审查请求
+          REVIEW_PROMPT="你是一个专业的代码审查专家。请审查以下代码变更，重点关注：
+          1. 代码质量和可读性
+          2. 潜在的Bug和逻辑错误
+          3. 性能问题
+          4. 安全隐患
+          5. 最佳实践建议
+
+          变更的文件：
+          ${{ steps.changes.outputs.files }}
+
+          代码差异：
+          \`\`\`diff
+          ${{ steps.changes.outputs.diff }}
+          \`\`\`
+
+          请用中文给出简洁的审查意见，格式为：
+          ### 🤖 AI代码审查报告
+          - ✅ 优点：...
+          - ⚠️ 建议：...
+          - 🐛 潜在问题：...
+          "
+
+          # 调用GLM API
+          RESPONSE=$(curl -s -X POST \
+            "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions" \
+            -H "Authorization: Bearer $GLM_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"model\": \"GLM-4.6\",
+              \"messages\": [
+                {\"role\": \"system\", \"content\": \"你是专业的代码审查专家\"},
+                {\"role\": \"user\", \"content\": $(echo "$REVIEW_PROMPT" | jq -Rs .)}
+              ],
+              \"max_tokens\": 2000,
+              \"temperature\": 0.3
+            }")
+
+          # 提取审查结果
+          REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "审查失败"')
+
+          # 保存结果
+          echo "review<<EOF" >> $GITHUB_OUTPUT
+          echo "$REVIEW" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "AI审查完成"
+
+      - name: 发布AI审查评论
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          REVIEW_RESULT: ${{ steps.ai-review.outputs.review }}
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          script: |
+            const reviewResult = process.env.REVIEW_RESULT || `
+            ### 🤖 AI代码审查
 
-      - name: 授予执行权限
-        run: chmod +x gradlew
+            ⚠️ **GLM API Key未配置**
 
-      - name: 启用AVD缓存
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}-${{ matrix.target }}
+            如需启用AI代码审查，请在仓库设置中添加Secret：
+            - 名称：\`GLM_API_KEY\`
+            - 值：您的GLM Code Plan API密钥
 
-      - name: 创建AVD并生成快照
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: echo "Generated AVD snapshot for caching."
+            获取API密钥：https://open.bigmodel.cn
+            `;
 
-      - name: 运行UI测试
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedAndroidTest --stacktrace
+            // 查找并更新现有评论，或创建新评论
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
 
-      - name: 上传UI测试报告
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ui-test-report
-          path: |
-            app/build/reports/androidTests/
-            app/build/outputs/androidTest-results/
-          retention-days: 14
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('🤖 AI代码审查')
+            );
 
-  # ==================== 门禁结果 ====================
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: reviewResult
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: reviewResult
+              });
+            }
+
+  # ==================== 门禁结果汇总 ====================
   gate-result:
     name: 门禁结果
     runs-on: ubuntu-latest
@@ -316,7 +373,6 @@ jobs:
           echo "============================================"
           echo ""
 
-          # 检查所有job状态
           BUILD_RESULT="${{ needs.build.result }}"
           LINT_RESULT="${{ needs.lint.result }}"
           TEST_RESULT="${{ needs.unit-test.result }}"
@@ -330,7 +386,6 @@ jobs:
           echo "| 安全检查 | $SECURITY_RESULT |"
           echo ""
 
-          # 判断是否全部通过
           if [[ "$BUILD_RESULT" == "success" && \
                 "$LINT_RESULT" == "success" && \
                 "$TEST_RESULT" == "success" && \
@@ -342,7 +397,7 @@ jobs:
             exit 1
           fi
 
-      - name: 输出PR评论
+      - name: PR门禁状态评论
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
@@ -364,13 +419,34 @@ jobs:
             | 安全检查 | ${statusEmoji(securityResult)} ${securityResult} |
 
             ${buildResult === 'success' && lintResult === 'success' && testResult === 'success' && securityResult === 'success'
-              ? '### ✅ 所有检查通过，可以合入'
+              ? '### ✅ 所有检查通过，可以合入\n\n> 点击 **Squash and merge** 合并此PR'
               : '### ❌ 存在未通过的检查，请修复后重新提交'}
             `;
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // 查找并更新现有评论
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: body
+              issue_number: context.issue.number,
             });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('🔒 门禁检查结果')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }

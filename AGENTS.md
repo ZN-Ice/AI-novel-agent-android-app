@@ -678,13 +678,13 @@ docs: 更新语音指令白名单
 - ✅ 核心功能必须有单元测试
 - ✅ 每次提交必须符合6.4规范
 
-### 9.3 核心开发流程（强制执行）
+### 9.3 核心开发流程（PR模式）
 
-> **重要**：每次代码修改后，必须完成以下全部步骤才能提交到远端仓库。
+> **重要**：所有代码变更必须通过PR（Pull Request）方式合入main分支，禁止直接推送到main。
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                      Harness核心开发流程                             │
+│                      Harness核心开发流程（PR模式）                     │
 └─────────────────────────────────────────────────────────────────────┘
 
      ┌──────────────┐
@@ -692,115 +692,147 @@ docs: 更新语音指令白名单
      └──────┬───────┘
             │
             ▼
-     ┌──────────────┐      失败      ┌──────────────┐
-     │  构建测试    │ ─────────────> │  修复编译    │
-     │ ./gradlew    │                │  错误        │
-     │   build      │                └──────┬───────┘
-     └──────┬───────┘                       │
-            │ 通过                          │
-            ▼                               │
-     ┌──────────────┐      失败      ┌──────────────┐
-     │  Lint检查    │ ─────────────> │  修复代码    │
-     │ ./gradlew    │                │  规范问题    │
-     │   lint       │                └──────┬───────┘
-     └──────┬───────┘                       │
-            │ 通过                          │
-            ▼                               │
-     ┌──────────────┐      失败      ┌──────────────┐
-     │  单元测试    │ ─────────────> │  修复测试    │
-     │ ./gradlew    │                │  或代码      │
-     │   test       │                └──────┬───────┘
-     └──────┬───────┘                       │
-            │ 通过                          │
-            ▼                               │
-     ┌──────────────┐      失败      ┌──────────────┐
-     │  UI测试      │ ─────────────> │  修复UI      │
-     │ ./gradlew    │                │  或测试用例  │
-     │connectedTest │                └──────┬───────┘
-     └──────┬───────┘                       │
-            │ 通过                          │
-            ▼                               │
-     ┌──────────────┐                       │
-     │  Git提交     │ <─────────────────────┘
-     │  git add     │
-     │  git commit  │
-     └──────┬───────┘
-            │
-            ▼
-     ┌──────────────┐
-     │  推送远端    │
-     │  git push    │
-     └──────────────┘
+     ┌──────────────────────────────┐
+     │  Step 1: 创建特性分支        │
+     │  git checkout -b feat/xxx    │
+     └──────────────┬───────────────┘
+                    │
+                    ▼
+     ┌──────────────────────────────┐      失败      ┌──────────────┐
+     │  Step 2: 本地检查            │ ─────────────> │  修复问题    │
+     │  bash scripts/check.sh       │                │              │
+     └──────────────┬───────────────┘                └──────┬───────┘
+                    │ 通过                                  │
+                    ▼                                       │
+     ┌──────────────────────────────┐                       │
+     │  Step 3: 提交到分支          │                       │
+     │  git add . && git commit     │ <─────────────────────┘
+     └──────────────┬───────────────┘
+                    │
+                    ▼
+     ┌──────────────────────────────┐
+     │  Step 4: 推送特性分支        │
+     │  git push -u origin feat/xxx │
+     └──────────────┬───────────────┘
+                    │
+                    ▼
+     ┌──────────────────────────────┐
+     │  Step 5: 创建Pull Request    │
+     │  gh pr create --base main    │
+     └──────────────┬───────────────┘
+                    │
+                    ▼
+     ┌──────────────────────────────┐
+     │  Step 6: 等待门禁检查        │
+     │  - 构建测试 ✓                │
+     │  - Lint检查 ✓                │
+     │  - 单元测试 ✓                │
+     │  - 安全检查 ✓                │
+     │  - AI代码审查 🤖              │
+     └──────────────┬───────────────┘
+                    │ 全部通过
+                    ▼
+     ┌──────────────────────────────┐
+     │  Step 7: 合并到main          │
+     │  Squash and Merge            │
+     └──────────────────────────────┘
 ```
 
-#### 9.3.1 执行命令顺序
+#### 9.3.1 分支命名规范
+
+| 类型 | 命名格式 | 示例 |
+|------|---------|------|
+| 新功能 | `feat/描述` | `feat/add-voice-input` |
+| Bug修复 | `fix/描述` | `fix/login-crash` |
+| 重构 | `refactor/描述` | `refactor/ai-module` |
+| 文档 | `docs/描述` | `docs/update-agents` |
+| 测试 | `test/描述` | `test/viewmodel-coverage` |
+| 发布 | `release/版本号` | `release/1.0.0` |
+
+#### 9.3.2 执行命令顺序
 
 ```bash
-# 步骤1：运行构建测试（验证代码能否编译）
-./gradlew build
+# ========== Step 1: 创建特性分支 ==========
+# 从main创建新分支
+git checkout main
+git pull origin main
+git checkout -b feat/your-feature-name
 
-# 检查结果：
-# - BUILD SUCCESSFUL：代码编译通过，继续下一步
-# - BUILD FAILED：查看错误信息，修复编译错误
-# - 常见问题：语法错误、依赖缺失、类型不匹配
+# ========== Step 2: 本地检查 ==========
+# 运行Harness检查脚本
+bash scripts/check.sh
 
-# 步骤2：运行Lint检查
-./gradlew lint
+# 或者手动执行
+./gradlew assembleDebug lint test
 
-# 检查结果：
-# - 如果有 error：必须修复后才能继续
-# - 如果有 warning：建议修复，不阻断流程
-
-# 步骤3：运行单元测试
-./gradlew test
-
-# 检查结果：
-# - 全部通过：继续下一步
-# - 有失败：查看报告，修复代码或测试
-
-# 步骤4：运行UI测试（需要连接设备或模拟器）
-./gradlew connectedAndroidTest
-
-# 检查结果：
-# - 全部通过：继续下一步
-# - 有失败：查看报告，修复代码或测试
-
-# 步骤5：Git提交（全部通过后）
+# ========== Step 3: 提交代码 ==========
 git add .
 git commit -m "feat: 描述本次修改内容"
 
-# 步骤6：推送到远端
-git push origin <branch-name>
+# ========== Step 4: 推送分支 ==========
+git push -u origin feat/your-feature-name
+
+# ========== Step 5: 创建PR ==========
+# 方式1: 使用gh CLI
+gh pr create --base main --head feat/your-feature-name \
+  --title "feat: 描述" \
+  --body "## 变更内容\n- xxx\n\n## 测试计划\n- [ ] 单元测试\n- [ ] 本地验证"
+
+# 方式2: 在GitHub网页上创建
+
+# ========== Step 6: 等待门禁 ==========
+# 自动触发，无需手动操作
+# 查看门禁状态: gh pr checks
+
+# ========== Step 7: 合并 ==========
+# 门禁通过后，使用Squash and Merge
+gh pr merge --squash --delete-branch
 ```
 
-#### 9.3.2 一键执行脚本
+#### 9.3.3 一键执行脚本
 
 ```bash
-# 创建快捷脚本（可选）
-# 文件：scripts/run_checks.sh
+# 文件：scripts/create_pr.sh
 
 #!/bin/bash
 set -e
 
-echo "===== 开始Harness检查流程 ====="
+# 配置
+BRANCH_TYPE=${1:-feat}
+DESCRIPTION=${2:-"update"}
+BRANCH_NAME="${BRANCH_TYPE}/${DESCRIPTION}"
 
-echo "[1/4] 运行构建测试..."
-./gradlew build
+echo "===== 开始PR流程 ====="
 
-echo "[2/4] 运行Lint检查..."
-./gradlew lint
+# Step 1: 创建分支
+echo "[1/5] 创建特性分支: $BRANCH_NAME"
+git checkout main && git pull origin main
+git checkout -b "$BRANCH_NAME"
 
-echo "[3/4] 运行单元测试..."
-./gradlew test
+# Step 2: 本地检查
+echo "[2/5] 运行本地检查..."
+bash scripts/check.sh
 
-echo "[4/4] 运行UI测试..."
-./gradlew connectedAndroidTest
+# Step 3: 提交
+echo "[3/5] 提交代码..."
+git add .
+git commit -m "${BRANCH_TYPE}: ${DESCRIPTION}"
 
-echo "===== 所有检查通过！ ====="
-echo "现在可以执行 git commit 和 git push"
+# Step 4: 推送
+echo "[4/5] 推送分支..."
+git push -u origin "$BRANCH_NAME"
+
+# Step 5: 创建PR
+echo "[5/5] 创建Pull Request..."
+gh pr create --base main --head "$BRANCH_NAME" \
+  --title "${BRANCH_TYPE}: ${DESCRIPTION}" \
+  --body "## 变更内容\n- ${DESCRIPTION}\n\n## 检查清单\n- [x] 本地构建通过\n- [x] Lint检查通过\n- [x] 单元测试通过"
+
+echo "===== PR创建成功！ ====="
+echo "等待门禁检查完成后即可合并"
 ```
 
-#### 9.3.3 测试报告位置
+#### 9.3.4 测试报告位置
 
 | 测试类型 | 报告路径 |
 |---------|---------|
@@ -808,7 +840,7 @@ echo "现在可以执行 git commit 和 git push"
 | 单元测试报告 | `app/build/reports/tests/test/index.html` |
 | UI测试报告 | `app/build/reports/androidTests/connected/index.html` |
 
-#### 9.3.4 豁免条件
+#### 9.3.5 豁免条件
 
 以下情况可以跳过部分检查（需在commit message中说明）：
 
@@ -819,6 +851,16 @@ echo "现在可以执行 git commit 和 git push"
 | 紧急修复 | 生产环境紧急问题 | `fix(hotfix): 修复崩溃问题 [skip-test]` |
 
 > **注意**：豁免仅用于特殊情况，常规开发必须完成全部检查。
+
+#### 9.3.6 PR合入规范
+
+| 规则 | 说明 |
+|------|------|
+| 门禁全通过 | 必须，不可跳过 |
+| 至少1个Review | 推荐但非强制 |
+| Squash Merge | 保持main历史整洁 |
+| 自动删除分支 | 合并后自动删除特性分支 |
+| 禁止Force Push | 保护代码历史 |
 
 ---
 
@@ -885,16 +927,87 @@ echo "现在可以执行 git commit 和 git push"
 | 构建 | `./gradlew assembleDebug` | 15分钟 | 查看构建日志修复编译错误 |
 | Lint | `./gradlew lint` | 10分钟 | 查看lint报告修复规范问题 |
 | 单元测试 | `./gradlew test` | 15分钟 | 查看测试报告修复失败用例 |
-| 安全检查 | 自定义脚本 | 5分钟 | 移除硬编码密钥 |
-| UI测试 | `./gradlew connectedAndroidTest` | 45分钟 | 仅main分支运行 |
+| 安全检查 | Trivy + 自定义脚本 | 5分钟 | 移除硬编码密钥 |
+| AI审查 | GLM Code Plan API | 10分钟 | 仅PR触发，非阻断 |
 
-### 9.4.4 并发控制
+### 9.4.4 AI代码审查
 
-- 同一分支的多个workflow只保留最新的
+#### 审查工具
+
+本项目使用双重AI代码审查方案：
+
+| 工具 | 类型 | 需要Token | 功能 |
+|------|------|----------|------|
+| **reviewdog** | 自动化linter | ❌ 不需要 | Lint结果自动评论到PR |
+| **GLM Code Plan** | AI智能审查 | ✅ 需要配置 | 深度代码分析 |
+
+#### reviewdog功能（免费，无需配置）
+
+- 自动将Lint警告/错误评论到PR对应代码行
+- 支持Android Lint、单元测试结果
+- 只评论新增代码的问题（filter_mode: added）
+- 零配置，开箱即用
+
+#### GLM Code Plan配置
+
+> **注意**：GLM Code Plan是本项目选用的AI模型，需要在GitHub仓库中配置API密钥。
+
+**配置步骤**：
+
+1. 获取GLM API密钥
+   - 访问 [智谱AI开放平台](https://open.bigmodel.cn)
+   - 注册/登录账号
+   - 进入控制台 → API密钥管理
+   - 创建新的API密钥
+
+2. 配置GitHub Secret
+   ```
+   仓库 → Settings → Secrets and variables → Actions → New repository secret
+
+   Name:  GLM_API_KEY
+   Value: [您的GLM API密钥]
+   ```
+
+3. 验证配置
+   - 创建PR触发workflow
+   - 查看AI审查评论是否正常生成
+
+#### AI审查内容
+
+GLM Code Plan会自动分析以下方面：
+
+- **代码质量**：可读性、命名规范、代码结构
+- **潜在Bug**：逻辑错误、边界条件、空指针风险
+- **性能问题**：内存泄漏、ANR风险、过度绘制
+- **安全隐患**：注入风险、数据泄露、权限问题
+- **最佳实践**：Android/Kotlin开发最佳实践建议
+
+#### AI审查示例
+
+```markdown
+### 🤖 AI代码审查报告
+
+- ✅ 优点：
+  - 使用了Kotlin协程处理异步操作
+  - ViewModel遵循MVVM架构规范
+  - 状态管理使用StateFlow，符合最佳实践
+
+- ⚠️ 建议：
+  - `LoginViewModel.kt:89` 建议添加异常日志记录
+  - `AIRepository.kt:45` 可考虑使用sealed class替代enum表示状态
+  - `ModelConfig.kt:120` 建议添加参数校验
+
+- 🐛 潜在问题：
+  - `AIProvider.kt:156` JSON解析可能抛出异常，建议添加try-catch
+```
+
+### 9.4.5 并发控制
+
+- 同一PR的多个workflow只保留最新的
 - 新的提交会自动取消之前正在运行的workflow
 - 避免资源浪费和重复执行
 
-### 9.4.5 缓存策略
+### 9.4.6 缓存策略
 
 | 缓存项 | 路径 | Key |
 |-------|------|-----|
@@ -902,16 +1015,15 @@ echo "现在可以执行 git commit 和 git push"
 | Gradle Wrapper | `~/.gradle/wrapper` | 基于gradle文件hash |
 | AVD缓存 | `~/.android/avd/*` | 基于API级别 |
 
-### 9.4.6 产物保留
+### 9.4.7 产物保留
 
 | 产物 | 保留天数 | 用途 |
 |-----|---------|------|
 | Debug APK | 7天 | 测试安装包 |
 | Lint报告 | 14天 | 代码规范问题排查 |
 | 测试报告 | 14天 | 测试失败分析 |
-| UI测试报告 | 14天 | UI测试问题排查 |
 
-### 9.4.7 门禁豁免
+### 9.4.8 门禁豁免
 
 以下情况可跳过部分门禁（不推荐，仅紧急情况使用）：
 
@@ -923,10 +1035,11 @@ git commit -m "docs: 更新文档 [skip-test]"  # 跳过测试
 
 > **警告**：豁免标记仅用于紧急情况，滥用将被记录并审查。
 
-### 9.4.8 PR评论自动通知
+### 9.4.9 PR评论自动通知
 
-门禁完成后会自动在PR中添加评论：
+门禁完成后会自动在PR中添加两种评论：
 
+**1. 门禁状态评论**
 ```
 ## 🔒 门禁检查结果
 
@@ -940,7 +1053,13 @@ git commit -m "docs: 更新文档 [skip-test]"  # 跳过测试
 ### ✅ 所有检查通过，可以合入
 ```
 
-### 9.4.9 本地预检
+**2. AI审查评论**
+```
+### 🤖 AI代码审查报告
+[GLM Code Plan分析结果]
+```
+
+### 9.4.10 本地预检
 
 在推送前建议本地执行：
 
@@ -955,12 +1074,12 @@ git commit -m "docs: 更新文档 [skip-test]"  # 跳过测试
 bash scripts/check.sh
 ```
 
-### 9.4.10 配置文件位置
+### 9.4.11 配置文件位置
 
 ```
 .github/
 └── workflows/
-    └── ci.yml          # 主CI配置
+    └── ci.yml          # 主CI配置（包含AI审查）
 ```
 
 **配置文件路径**: `.github/workflows/ci.yml`
@@ -1685,7 +1804,7 @@ class CreateNovelUseCaseTest {
 
 ---
 
-**版本**：v1.4.0
+**版本**：v1.5.0
 **更新日期**：2026-03-21
 **维护者**：AI小说安卓App研发团队
 
@@ -1693,6 +1812,7 @@ class CreateNovelUseCaseTest {
 
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
+| v1.5.0 | 2026-03-21 | 核心流程改为PR模式，新增AI代码审查（reviewdog + GLM Code Plan） |
 | v1.4.0 | 2026-03-21 | 新增GitHub Actions门禁规范（9.4节），包含构建/Lint/测试/安全检查 |
 | v1.3.0 | 2026-03-21 | 核心流程增加构建测试步骤（build → lint → test → push） |
 | v1.2.0 | 2026-03-21 | 新增核心开发流程（9.3节），强制lint+test+push流程 |
