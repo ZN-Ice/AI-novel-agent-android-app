@@ -113,7 +113,7 @@ dependencies {
     implementation(libs.bundles.coroutines)
 
     // ffmpeg语音处理
-    implementation(libs.ffmpeg.kit.full)
+    implementation(libs.bundles.ffmpeg)
 
     // 图片加载
     implementation(libs.glide)
