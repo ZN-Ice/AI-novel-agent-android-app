@@ -30,7 +30,7 @@ import javax.inject.Inject
  *
  * @see AGENTS.md 5.3节
  */
-@iltViewModel
+@HiltViewModel
 class EditorViewModel @Inject constructor(
     private val novelRepository: NovelRepository,
     private val chapterRepository: ChapterRepository,
