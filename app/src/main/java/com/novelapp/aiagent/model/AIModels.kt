@@ -68,6 +68,25 @@ enum class FinishReason(val label: String) {
 }
 
 /**
+ * AI结果封装类
+ *
+ * @param data 成功时的数据
+ * @param error 失败时的错误信息
+ */
+data class AIResult<T>(
+    val data: T? = null,
+    val error: String? = null
+) {
+    val isSuccess: Boolean
+        get() = data != null && error == null
+
+    companion object {
+        fun <T> success(data: T): AIResult<T> = AIResult(data = data)
+        fun <T> failure(error: String): AIResult<T> = AIResult(error = error)
+    }
+}
+
+/**
  * AI生成状态
  */
 sealed class AIGenerateState {

@@ -38,6 +38,9 @@ ffmpeg-kit = "2.1.0"
 # 图片加载
 glide = "4.16.0"
 
+# 日志
+timber = "5.0.1"
+
 # 测试
 junit = "4.13.2"
 androidx-test-ext = "1.1.5"
@@ -97,6 +100,9 @@ ffmpeg-kit-full = { group = "com.antonkarpenko", name = "ffmpeg-kit-full", versi
 
 # 图片加载
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+
+# 日志
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # 测试库
 junit = { group = "junit", name = "junit", version.ref = "junit" }

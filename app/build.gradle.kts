@@ -118,6 +118,9 @@ dependencies {
     // 图片加载
     implementation(libs.glide)
 
+    // 日志
+    implementation(libs.timber)
+
     // ============ 测试依赖 ============
     // 单元测试
     testImplementation(libs.bundles.test)
