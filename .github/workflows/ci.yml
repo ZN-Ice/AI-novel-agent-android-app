@@ -106,16 +106,6 @@ jobs:
       - name: 运行Lint
         run: ./gradlew lint --stacktrace
 
-      - name: 运行Lint（reviewdog报告）
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-android-lint@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: added
-          fail_on_error: true
-          level: warning
-
       - name: 上传Lint报告
         uses: actions/upload-artifact@v4
         if: always()
@@ -156,15 +146,6 @@ jobs:
 
       - name: 运行单元测试
         run: ./gradlew test --stacktrace
-
-      - name: 发布测试报告（reviewdog）
-        if: github.event_name == 'pull_request' && always()
-        uses: reviewdog/action-junit-report@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: added
-          junit_files: app/build/test-results/testDebugUnitTest/*.xml
 
       - name: 上传测试报告
         uses: actions/upload-artifact@v4
