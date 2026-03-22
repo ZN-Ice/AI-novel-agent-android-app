@@ -1,7 +1,7 @@
-// CI环境检测
-val isCi = System.getenv("CI") == "true"
-
 pluginManagement {
+    // CI环境检测：CI环境使用原始仓库，本地开发使用阿里云镜像
+    val isCi = System.getenv("CI") == "true"
+
     repositories {
         if (isCi) {
             // CI环境：使用原始仓库
@@ -23,6 +23,10 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+
+    // CI环境检测：CI环境使用原始仓库，本地开发使用阿里云镜像
+    val isCi = System.getenv("CI") == "true"
+
     repositories {
         if (isCi) {
             // CI环境：使用原始仓库
