@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Foreground safe area is 72x72 centered at 54,54 -->
+    <group
+        android:translateX="27"
+        android:translateY="27">
+        <!-- Book icon -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,4L18,4C14.69,4 12,6.69 12,10L12,62C12,65.31 14.69,68 18,68L54,68C57.31,68 60,65.31 60,62L60,10C60,6.69 57.31,4 54,4zM54,62L18,62L18,10L54,10L54,62z"/>
+        <!-- AI brain circle -->
+        <path
+            android:fillColor="#3DDC84"
+            android:pathData="M36,24m-10,0a10,10 0,1 1,20,0a10,10 0,1 1,-20,0"/>
+        <!-- Neural network lines -->
+        <path
+            android:pathData="M26,36L26,44M46,36L46,44M26,52L26,44L46,44L46,52"
+            android:strokeColor="#3DDC84"
+            android:strokeWidth="2"
+            android:fillType="evenOdd"/>
+        <!-- Book pages -->
+        <path
+            android:fillColor="#E8E8E8"
+            android:pathData="M20,14L32,14L32,58L20,58z"/>
+    </group>
+</vector>
