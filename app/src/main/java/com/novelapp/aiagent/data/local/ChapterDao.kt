@@ -25,8 +25,10 @@ interface ChapterDao {
 
     /**
      * 获取小说的章节列表（不含内容，用于列表显示）
+     * 注意：由于Room要求查询必须包含所有非空字段，这里返回所有字段
+     * 如需优化内存，可考虑使用专门的ChapterListItem数据类
      */
-    @Query("SELECT id, novelId, title, wordCount, chapterNumber, status, updatedAt, createdAt, isPublished FROM chapters WHERE novelId = :novelId ORDER BY chapterNumber ASC")
+    @Query("SELECT * FROM chapters WHERE novelId = :novelId ORDER BY chapterNumber ASC")
     fun getChapterListByNovelId(novelId: String): Flow<List<ChapterEntity>>
 
     /**

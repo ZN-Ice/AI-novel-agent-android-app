@@ -3,7 +3,6 @@ package com.novelapp.aiagent.base
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
-import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Activity基类
@@ -13,8 +12,10 @@ import dagger.hilt.android.AndroidEntryPoint
  * - 统一权限请求处理
  * - 统一Toast显示
  * - 生命周期日志
+ *
+ * 注意：子类需要使用Hilt依赖注入时，必须在子类上添加@AndroidEntryPoint注解
+ * Hilt不支持在带有泛型参数的基类上使用@AndroidEntryPoint
  */
-@AndroidEntryPoint
 abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
 
     // ViewBinding实例，由子类创建
