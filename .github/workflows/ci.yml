@@ -159,11 +159,12 @@ jobs:
 
       - name: 发布测试报告（reviewdog）
         if: github.event_name == 'pull_request' && always()
-        uses: reviewdog/action-report@v1
+        uses: reviewdog/action-junit-report@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           filter_mode: added
+          junit_files: app/build/test-results/testDebugUnitTest/*.xml
 
       - name: 上传测试报告
         uses: actions/upload-artifact@v4
@@ -199,9 +200,10 @@ jobs:
       - name: 检查硬编码密钥
         run: |
           echo "检查硬编码API密钥..."
+          # 排除测试文件（测试文件中的密钥是用于测试安全检测功能的假数据）
           if grep -rE "(api[_-]?key|apikey|secret|password|token)\s*[=:]\s*['\"][^'\"]{10,}['\"]" \
             --include="*.kt" --include="*.java" --include="*.xml" \
-            --exclude-dir=".gradle" --exclude-dir="build" .; then
+            --exclude-dir=".gradle" --exclude-dir="build" --exclude-dir="test" --exclude-dir="androidTest" .; then
             echo "::error::发现硬编码的密钥，请使用环境变量或加密存储"
             exit 1
           fi
