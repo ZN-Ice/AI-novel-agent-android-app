@@ -278,14 +278,14 @@ data class LoginConfig(
      * 转换为完整的ModelConfig
      */
     fun toModelConfig(): ModelConfig {
-        return when (providerType) {
-            ModelProviderType.GLM_CODEPLAN -> {
-                ModelConfig.createGLMConfig(
-                    glmModel = glmModel ?: GLMModel.GLM_4_6,
-                    apiKey = apiKey
-                )
-            }
-        }
+        val baseUrl = customBaseUrl ?: providerType.defaultBaseUrl
+        return ModelConfig(
+            providerType = providerType,
+            glmModel = glmModel ?: GLMModel.GLM_4_6,
+            apiKey = apiKey,
+            baseUrl = baseUrl,
+            modelName = glmModel?.modelId ?: GLMModel.GLM_4_6.modelId
+        )
     }
 
     /**
