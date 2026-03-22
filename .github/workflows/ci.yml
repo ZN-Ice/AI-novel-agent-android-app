@@ -106,6 +106,15 @@ jobs:
       - name: 运行Lint
         run: ./gradlew lint --stacktrace
 
+      - name: 发布Lint报告（reviewdog）
+        if: github.event_name == 'pull_request' && always()
+        uses: dvdandroid/action-android-lint@v1.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          lint_xml_file: app/build/reports/lint-results.xml
+          level: warning
+          reporter: github-pr-review
+
       - name: 上传Lint报告
         uses: actions/upload-artifact@v4
         if: always()
