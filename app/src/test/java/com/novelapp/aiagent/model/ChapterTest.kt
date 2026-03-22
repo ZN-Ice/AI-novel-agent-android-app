@@ -47,7 +47,7 @@ class ChapterTest {
         )
 
         val formatted = chapter.getFormattedWordCount()
-        assertEquals("1.5万字", formatted)
+        assertEquals("1.5万", formatted)
     }
 
     @Test

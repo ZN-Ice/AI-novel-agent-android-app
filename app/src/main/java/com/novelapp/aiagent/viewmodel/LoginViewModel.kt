@@ -1,5 +1,6 @@
 package com.novelapp.aiagent.viewmodel
 
+import androidx.lifecycle.viewModelScope
 import com.novelapp.aiagent.ai.config.*
 import com.novelapp.aiagent.ai.config.ModelConfigManager
 import com.novelapp.aiagent.base.BaseViewModel

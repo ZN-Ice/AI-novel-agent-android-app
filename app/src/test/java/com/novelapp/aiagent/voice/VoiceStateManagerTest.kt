@@ -1,5 +1,6 @@
 package com.novelapp.aiagent.voice
 
+import com.novelapp.aiagent.model.VoiceCommandType
 import com.novelapp.aiagent.model.VoiceState
 import org.junit.Assert.*
 import org.junit.Before
@@ -48,7 +49,7 @@ class VoiceStateManagerTest {
     @Test
     fun `updateState to Success generates correct feedback`() {
         val successState = VoiceState.Success(
-            com.novelapp.aiagent.model.VoiceCommand.CREATE_NOVEL,
+            VoiceCommandType.CREATE_NOVEL,
             "新建小说"
         )
 

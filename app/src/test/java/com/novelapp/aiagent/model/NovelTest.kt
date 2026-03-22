@@ -20,7 +20,7 @@ class NovelTest {
     }
 
     @Test
-    fun `when wordCount >= 10000 then format as wan`() {
+    fun `when wordCount gte 10000 then format as wan`() {
         val novel = Novel(
             id = "test-id",
             title = "测试小说",
@@ -32,7 +32,7 @@ class NovelTest {
     }
 
     @Test
-    fun `when wordCount < 10000 then format as number`() {
+    fun `when wordCount lt 10000 then format as number`() {
         val novel = Novel(
             id = "test-id",
             title = "测试小说",

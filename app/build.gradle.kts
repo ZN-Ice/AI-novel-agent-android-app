@@ -113,10 +113,16 @@ dependencies {
     implementation(libs.bundles.coroutines)
 
     // ffmpeg语音处理
-    implementation(libs.ffmpeg.kit.full)
+    implementation(libs.bundles.ffmpeg)
 
     // 图片加载
     implementation(libs.glide)
+
+    // 日志
+    implementation(libs.timber)
+
+    // 安全加密
+    implementation(libs.bundles.security)
 
     // ============ 测试依赖 ============
     // 单元测试

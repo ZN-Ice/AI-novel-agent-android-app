@@ -8,18 +8,11 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
 }
 
-// 全局配置
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
 // 自定义任务：运行所有检查
 tasks.register("runAllChecks") {
     dependsOn(":app:lint")
     dependsOn(":app:test")
+
     doLast {
         println("All checks passed!")
     }

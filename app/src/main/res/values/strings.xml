@@ -43,6 +43,7 @@
     <string name="editor_voice_input">语音输入</string>
     <string name="editor_saving">保存中…</string>
     <string name="editor_saved">已保存</string>
+    <string name="hint_editor">开始创作…</string>
 
     <!-- ============ 语音模块 ============ -->
     <string name="voice_listening">正在聆听…</string>

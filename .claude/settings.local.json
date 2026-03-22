@@ -6,7 +6,11 @@
       "Bash(mkdir:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(bash:*)",
+      "Bash(gh run:*)",
+      "WebSearch",
+      "mcp__web-reader__webReader"
     ]
   }
 }

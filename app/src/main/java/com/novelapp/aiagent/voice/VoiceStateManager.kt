@@ -145,18 +145,44 @@ class VoiceStateManager @Inject constructor() {
             result.isSuccess -> {
                 updateRecognizedText(result.text)
                 if (result.isFinal) {
-                    updateState(VoiceState.Success(
-                        com.novelapp.aiagent.model.VoiceCommand.parse(result.text)
-                            ?: com.novelapp.aiagent.model.VoiceCommand.CREATE_NOVEL,
-                        result.text
-                    ))
+                    // Parse command from text - default to CREATE_NOVEL if not recognized
+                    val command = parseCommandFromText(result.text)
+                    updateState(VoiceState.Success(command, result.text))
                 }
             }
-            result.isError -> {
+            result.errorCode != null -> {
                 updateState(VoiceState.Error(
                     result.errorMessage ?: "识别失败"
                 ))
             }
+        }
+    }
+
+    /**
+     * Parse voice command from recognized text
+     */
+    private fun parseCommandFromText(text: String): VoiceCommandType {
+        // Simple keyword matching - can be enhanced with NLP
+        return when {
+            text.contains("新建小说") || text.contains("创建小说") -> VoiceCommandType.CREATE_NOVEL
+            text.contains("新建章节") || text.contains("创建章节") -> VoiceCommandType.CREATE_CHAPTER
+            text.contains("删除小说") -> VoiceCommandType.DELETE_NOVEL
+            text.contains("删除章节") -> VoiceCommandType.DELETE_CHAPTER
+            text.contains("确认删除") -> VoiceCommandType.CONFIRM_DELETE
+            text.contains("取消删除") -> VoiceCommandType.CANCEL_DELETE
+            text.contains("进入创作") || text.contains("开始编辑") -> VoiceCommandType.ENTER_EDITOR
+            text.contains("开始写作") || text.contains("开始写") -> VoiceCommandType.START_WRITING
+            text.contains("暂停") -> VoiceCommandType.PAUSE
+            text.contains("继续") -> VoiceCommandType.CONTINUE
+            text.contains("撤销") -> VoiceCommandType.UNDO
+            text.contains("重做") -> VoiceCommandType.REDO
+            text.contains("保存") -> VoiceCommandType.SAVE
+            text.contains("返回首页") || text.contains("回到首页") -> VoiceCommandType.GO_HOME
+            text.contains("下一章") -> VoiceCommandType.NEXT_CHAPTER
+            text.contains("上一章") || text.contains("前一章") -> VoiceCommandType.PREV_CHAPTER
+            text.contains("设置") -> VoiceCommandType.SETTINGS
+            text.contains("帮助") -> VoiceCommandType.HELP
+            else -> VoiceCommandType.CREATE_NOVEL // Default
         }
     }
 
