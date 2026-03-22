@@ -19,6 +19,12 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# 权限配置：PR评论需要 write 权限
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
 # 并发控制：同一PR/分支只保留最新的workflow
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
