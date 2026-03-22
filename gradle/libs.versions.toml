@@ -41,6 +41,9 @@ glide = "4.16.0"
 # 日志
 timber = "5.0.1"
 
+# 安全加密
+security-crypto = "1.1.0-alpha06"
+
 # 测试
 junit = "4.13.2"
 androidx-test-ext = "1.1.5"
@@ -104,6 +107,9 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 # 日志
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
+# 安全加密
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+
 # 测试库
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext" }
@@ -132,3 +138,4 @@ coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-android"]
 ffmpeg = ["ffmpeg-kit-full"]
 test = ["junit", "kotlinx-coroutines-test", "mockk", "turbine"]
 android-test = ["androidx-test-ext", "androidx-test-espresso-core"]
+security = ["androidx-security-crypto"]

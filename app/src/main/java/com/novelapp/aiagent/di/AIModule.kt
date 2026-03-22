@@ -2,6 +2,7 @@ package com.novelapp.aiagent.di
 
 import android.content.Context
 import com.novelapp.aiagent.ai.AIRepository
+import com.novelapp.aiagent.ai.ContextManager
 import com.novelapp.aiagent.ai.config.ModelConfigManager
 import com.novelapp.aiagent.ai.providers.AIProvider
 import com.novelapp.aiagent.ai.providers.AIProviderFactory
@@ -32,9 +33,10 @@ object AIModule {
     @Provides
     @Singleton
     fun provideAIRepository(
-        modelConfigManager: ModelConfigManager
+        modelConfigManager: ModelConfigManager,
+        contextManager: ContextManager
     ): AIRepository {
-        return AIRepository(modelConfigManager)
+        return AIRepository(modelConfigManager, contextManager)
     }
 
     // 注册AI Providers

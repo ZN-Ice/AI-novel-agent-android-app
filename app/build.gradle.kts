@@ -121,6 +121,9 @@ dependencies {
     // 日志
     implementation(libs.timber)
 
+    // 安全加密
+    implementation(libs.bundles.security)
+
     // ============ 测试依赖 ============
     // 单元测试
     testImplementation(libs.bundles.test)

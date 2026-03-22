@@ -77,7 +77,7 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
      * @param permissions 权限数组
      * @param requestCode 请求码
      */
-    protected fun requestPermissions(permissions: Array<String>, requestCode: Int) {
+    protected fun requestPermissionsCompat(permissions: Array<String>, requestCode: Int) {
         requestPermissions(permissions, requestCode)
     }
 

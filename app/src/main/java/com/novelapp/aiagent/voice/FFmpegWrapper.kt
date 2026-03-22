@@ -202,10 +202,15 @@ class FFmpegWrapper(private val context: Context) {
             val duration = mediaInformation.duration?.toDoubleOrNull() ?: 0.0
             val stream = mediaInformation.streams?.firstOrNull()
 
+            // Get channels from stream properties - use getStringProperty for compatibility
+            val channels = stream?.let { s ->
+                s.getStringProperty("channels")?.toIntOrNull() ?: 0
+            } ?: 0
+
             val audioInfo = AudioInfo(
                 duration = duration,
                 sampleRate = stream?.sampleRate?.toIntOrNull() ?: 0,
-                channels = stream?.channels?.toIntOrNull() ?: 0,
+                channels = channels,
                 bitRate = mediaInformation.bitrate?.toIntOrNull() ?: 0,
                 format = mediaInformation.format ?: "unknown"
             )

@@ -211,19 +211,17 @@ class EditorViewModel @Inject constructor(
                 instruction = instruction
             )
 
-            result.fold(
-                onSuccess = { response ->
-                    val generatedText = response.data?.text ?: ""
-                    _aiState.value = AIGenerateState.Success(response.data!!)
+            if (result.isSuccess) {
+                val response = result.data!!
+                val generatedText = response.data?.text ?: ""
+                _aiState.value = AIGenerateState.Success(response.data!!)
 
-                    // 追加生成的内容
-                    updateContent(_content.value + "\n" + generatedText)
-                },
-                onFailure = { error ->
-                    Timber.e(error, "AI generation failed")
-                    _aiState.value = AIGenerateState.Error(error.message ?: "生成失败")
-                }
-            )
+                // 追加生成的内容
+                updateContent(_content.value + "\n" + generatedText)
+            } else {
+                Timber.e("AI generation failed: ${result.error}")
+                _aiState.value = AIGenerateState.Error(result.error ?: "生成失败")
+            }
         }
     }
 

@@ -31,7 +31,7 @@ class VoiceCommandExecutor @Inject constructor() {
 
     // 执行结果流
     private val _resultFlow = MutableSharedFlow<CommandResult>(extraBufferCapacity = 1)
-    val resultFlow: SharedFlow<CommandResult> = _commandFlow.asSharedFlow()
+    val resultFlow: SharedFlow<CommandResult> = _resultFlow.asSharedFlow()
 
     /**
      * 指令事件
