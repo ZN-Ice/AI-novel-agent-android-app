@@ -111,7 +111,7 @@ jobs:
         uses: dvdandroid/action-android-lint@v1.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          lint_xml_file: app/build/reports/lint-results.xml
+          lint_xml_file: app/build/reports/lint-results-debug.xml
           level: warning
           reporter: github-pr-review
 
