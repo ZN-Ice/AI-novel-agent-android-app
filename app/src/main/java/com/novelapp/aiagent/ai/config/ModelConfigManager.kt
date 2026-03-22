@@ -284,7 +284,7 @@ sealed class LoginResult {
     data class SaveFailed(val message: String) : LoginResult()
 
     val isSuccess: Boolean get() = this is Success
-    val isError: Boolean get() = this is !Success
+    val isError: Boolean get() = this !is Success
     val errorMessage: String?
         get() = when (this) {
             is ValidationFailed -> message
