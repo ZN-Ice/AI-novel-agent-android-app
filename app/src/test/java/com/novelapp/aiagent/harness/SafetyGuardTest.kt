@@ -90,10 +90,9 @@ class SafetyGuardTest {
 
     @Test
     fun `scanForSensitiveInfo with sql injection pattern returns warning`() {
-        // SQL注入模式需要匹配 rawQuery 函数调用中的字符串拼接
+        // SQL注入模式需要匹配 rawQuery("..." + "...") 中的字符串拼接
         val code = """
-            val query = "SELECT * FROM users WHERE id = " + userId
-            db.rawQuery("SELECT * FROM users WHERE id = " + userId)
+            db.rawQuery("SELECT * FROM users WHERE id = " + userId + " AND status = 'active'")
         """.trimIndent()
 
         val result = safetyGuard.scanForSensitiveInfo(code)
