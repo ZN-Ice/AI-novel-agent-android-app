@@ -1,9 +1,9 @@
 package com.novelapp.aiagent.voice
 
 import android.content.Context
-import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.FFmpegKitConfig
-import com.arthenica.ffmpegkit.FFprobeKit
+import com.antonkarpenko.ffmpegkit.FFmpegKit
+import com.antonkarpenko.ffmpegkit.FFmpegKitConfig
+import com.antonkarpenko.ffmpegkit.FFprobeKit
 import com.novelapp.aiagent.model.AIResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
