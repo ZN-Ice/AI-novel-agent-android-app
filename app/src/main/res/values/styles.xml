@@ -22,7 +22,6 @@
 
         <!-- 导航栏 -->
         <item name="android:navigationBarColor">@color/primary_dark</item>
-        <item name="android:windowLightNavigationBar">false</item>
 
         <!-- 文本外观 -->
         <item name="android:textColorPrimary">@color/text_primary</item>

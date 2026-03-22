@@ -1,5 +1,6 @@
 package com.novelapp.aiagent.voice
 
+import com.novelapp.aiagent.model.VoiceCommandType
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
