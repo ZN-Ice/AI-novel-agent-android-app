@@ -246,7 +246,7 @@ jobs:
           fetch-depth: 0
 
       - name: AI代码审查
-        uses: presubmit/ai-reviewer@latest
+        uses: presubmit/ai-reviewer@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.GLM_API_KEY }}
