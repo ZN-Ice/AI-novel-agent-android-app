@@ -943,7 +943,7 @@ echo "等待门禁检查完成后即可合并"
 | Lint | `./gradlew lint` | 10分钟 | 查看lint报告修复规范问题 |
 | 单元测试 | `./gradlew test` | 15分钟 | 查看测试报告修复失败用例 |
 | 安全检查 | Trivy + 自定义脚本 | 5分钟 | 移除硬编码密钥 |
-| AI审查 | GLM Code Plan API | 10分钟 | 仅PR触发，非阻断 |
+| AI审查 | presubmit/ai-reviewer + GLM-4.7 | 10分钟 | 仅PR触发，非阻断 |
 
 ### 9.4.4 AI代码审查
 
@@ -954,7 +954,7 @@ echo "等待门禁检查完成后即可合并"
 | 工具 | 类型 | 需要Token | 功能 |
 |------|------|----------|------|
 | **reviewdog** | 自动化linter | ❌ 不需要 | Lint结果自动评论到PR |
-| **GLM Code Plan** | AI智能审查 | ✅ 需要配置 | 深度代码分析 |
+| **ai-reviewer + GLM-4.7** | AI智能审查 | ✅ 需要配置 | 深度代码分析 |
 
 #### reviewdog功能（免费，无需配置）
 
@@ -963,9 +963,9 @@ echo "等待门禁检查完成后即可合并"
 - 只评论新增代码的问题（filter_mode: added）
 - 零配置，开箱即用
 
-#### GLM Code Plan配置
+#### ai-reviewer配置
 
-> **注意**：GLM Code Plan是本项目选用的AI模型，需要在GitHub仓库中配置API密钥。
+> **注意**：本项目使用 [presubmit/ai-reviewer](https://github.com/presubmit/ai-reviewer) + GLM-4.7 进行AI代码审查，需要在GitHub仓库中配置API密钥。
 
 **配置步骤**：
 
@@ -987,9 +987,15 @@ echo "等待门禁检查完成后即可合并"
    - 创建PR触发workflow
    - 查看AI审查评论是否正常生成
 
+**技术配置**：
+- Action: `presubmit/ai-reviewer@latest`
+- API地址: `https://open.bigmodel.cn/api/coding/paas/v4`
+- 模型: `GLM-4.7`
+- Provider: `ai-sdk`
+
 #### AI审查内容
 
-GLM Code Plan会自动分析以下方面：
+AI审查会自动分析以下方面：
 
 - **代码质量**：可读性、命名规范、代码结构
 - **潜在Bug**：逻辑错误、边界条件、空指针风险
@@ -1071,7 +1077,7 @@ git commit -m "docs: 更新文档 [skip-test]"  # 跳过测试
 **2. AI审查评论**
 ```
 ### 🤖 AI代码审查报告
-[GLM Code Plan分析结果]
+[presubmit/ai-reviewer + GLM-4.7 分析结果]
 ```
 
 ### 9.4.10 本地预检
@@ -1885,14 +1891,15 @@ class CreateNovelUseCaseTest {
 
 ---
 
-**版本**：v1.5.1
-**更新日期**：2026-03-21
+**版本**：v1.5.2
+**更新日期**：2026-03-23
 **维护者**：AI小说安卓App研发团队
 
 ### 版本历史
 
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
+| v1.5.2 | 2026-03-23 | AI审查改用presubmit/ai-reviewer + GLM-4.7（API: open.bigmodel.cn） |
 | v1.5.1 | 2026-03-21 | 新增9.4.12节门禁失败排查方法（gh CLI使用） |
 | v1.5.0 | 2026-03-21 | 核心流程改为PR模式，新增AI代码审查（reviewdog + GLM Code Plan） |
 | v1.4.0 | 2026-03-21 | 新增GitHub Actions门禁规范（9.4节），包含构建/Lint/测试/安全检查 |
