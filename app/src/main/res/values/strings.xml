@@ -14,7 +14,7 @@
     <string name="home_empty_hint">点击 + 开始你的创作之旅</string>
     <string name="home_voice_hint">说出\"新建小说\"开始创作</string>
     <string name="home_recent_edit">最近编辑：%s</string>
-    <string name="home_stats">章节：%d章 | 字数：%s</string>
+    <string name="home_stats">章节：%1$d章 | 字数：%2$s</string>
 
     <!-- ============ 新建小说 ============ -->
     <string name="create_title">新建小说</string>
@@ -23,7 +23,7 @@
     <string name="create_genre_label">小说类型（可选）</string>
     <string name="create_genre_xuanhuan">玄幻</string>
     <string name="create_genre_dushi">都市</string>
-    <string name="create_genrekehuan">科幻</string>
+    <string name="create_genre_kehuan">科幻</string>
     <string name="create_genre_wuxia">武侠</string>
     <string name="create_genre_qihuan">奇幻</string>
     <string name="create_genre_lishi">历史</string>

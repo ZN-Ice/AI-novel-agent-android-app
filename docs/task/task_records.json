@@ -161,11 +161,11 @@
     "task_desc": "实现HomeActivity小说列表功能",
     "module": "ui/home",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：小说列表RecyclerView、新建按钮、语音按钮、列表项点击跳转、滑动删除"
+    "finish_time": "2026-03-25 10:30:00",
+    "check_result": "通过",
+    "remark": "已完成：小说列表RecyclerView、NovelListAdapter、新建按钮、语音按钮、新建小说弹窗、删除确认弹窗、页面跳转"
   },
   {
     "task_id": "T20260324014",
