@@ -40,6 +40,7 @@
 
     <!-- 按钮区域 -->
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
@@ -48,7 +49,7 @@
 
         <Button
             android:id="@+id/btn_cancel"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_height_sm"
             android:text="@string/delete_cancel"
@@ -56,6 +57,7 @@
 
         <Button
             android:id="@+id/btn_confirm"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_height_sm"
             android:layout_marginStart="@dimen/spacing_sm"

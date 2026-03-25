@@ -73,7 +73,7 @@ class CreateNovelDialog : DialogFragment() {
         val genreButtons = listOf(
             binding.rbXuanhuan to R.string.create_genre_xuanhuan,
             binding.rbDushi to R.string.create_genre_dushi,
-            binding.rbKehuan to R.string.create_genrekehuan,
+            binding.rbKehuan to R.string.create_genre_kehuan,
             binding.rbWuxia to R.string.create_genre_wuxia,
             binding.rbQihuan to R.string.create_genre_qihuan,
             binding.rbLishi to R.string.create_genre_lishi

@@ -23,7 +23,7 @@
     <string name="create_genre_label">小说类型（可选）</string>
     <string name="create_genre_xuanhuan">玄幻</string>
     <string name="create_genre_dushi">都市</string>
-    <string name="create_genrekehuan">科幻</string>
+    <string name="create_genre_kehuan">科幻</string>
     <string name="create_genre_wuxia">武侠</string>
     <string name="create_genre_qihuan">奇幻</string>
     <string name="create_genre_lishi">历史</string>

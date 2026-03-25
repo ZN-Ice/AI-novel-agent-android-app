@@ -34,6 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/input_height"
         android:layout_marginTop="@dimen/spacing_sm"
+        android:autofillHints="text"
         android:background="@drawable/bg_input"
         android:hint="@string/create_name_hint"
         android:inputType="text"
@@ -82,7 +83,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/create_genrekehuan"
+            android:text="@string/create_genre_kehuan"
             android:textSize="@dimen/text_body_sm" />
 
     </RadioGroup>
@@ -134,6 +135,7 @@
 
     <!-- 按钮区域 -->
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
@@ -142,7 +144,7 @@
 
         <Button
             android:id="@+id/btn_cancel"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_height_sm"
             android:text="@string/create_cancel"
@@ -150,6 +152,7 @@
 
         <Button
             android:id="@+id/btn_confirm"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_height_sm"
             android:layout_marginStart="@dimen/spacing_sm"
