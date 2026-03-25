@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 小说列表项布局 -->
+<!-- 命名规范遵循 AGENTS.md 2.1节 -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="@dimen/list_item_padding">
+
+    <!-- 小说图标 -->
+    <ImageView
+        android:id="@+id/iv_novel_icon"
+        android:layout_width="@dimen/icon_lg"
+        android:layout_height="@dimen/icon_lg"
+        android:contentDescription="@string/cd_novel_icon"
+        android:src="@drawable/ic_novel_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_novel_default" />
+
+    <!-- 小说信息容器 -->
+    <LinearLayout
+        android:id="@+id/ll_novel_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_md"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iv_delete"
+        app:layout_constraintStart_toEndOf="@id/iv_novel_icon"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 小说标题 -->
+        <TextView
+            android:id="@+id/tv_novel_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_h3"
+            android:textStyle="bold"
+            tools:text="我的玄幻小说" />
+
+        <!-- 小说类型 -->
+        <TextView
+            android:id="@+id/tv_novel_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_caption"
+            tools:text="玄幻" />
+
+        <!-- 统计信息 -->
+        <TextView
+            android:id="@+id/tv_novel_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:textColor="@color/text_hint"
+            android:textSize="@dimen/text_caption"
+            tools:text="章节：12章 | 字数：3.2万" />
+
+        <!-- 最近编辑时间 -->
+        <TextView
+            android:id="@+id/tv_novel_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:textColor="@color/text_hint"
+            android:textSize="@dimen/text_small"
+            tools:text="最近编辑：2小时前" />
+
+    </LinearLayout>
+
+    <!-- 删除按钮 -->
+    <ImageView
+        android:id="@+id/iv_delete"
+        android:layout_width="@dimen/icon_md"
+        android:layout_height="@dimen/icon_md"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/cd_delete_novel"
+        android:focusable="true"
+        android:padding="@dimen/spacing_xs"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 分隔线 -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:background="@color/divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_novel_icon"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

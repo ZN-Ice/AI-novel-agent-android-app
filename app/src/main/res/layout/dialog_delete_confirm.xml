@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 删除确认弹窗布局 -->
+<!-- 命名规范遵循 AGENTS.md 2.1节 -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/surface"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/delete_title"
+        android:textColor="@color/error"
+        android:textSize="@dimen/text_h2"
+        android:textStyle="bold" />
+
+    <!-- 删除消息 -->
+    <TextView
+        android:id="@+id/tv_delete_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_body"
+        tools:text="确定要删除《我的小说》吗？" />
+
+    <!-- 提示信息 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="@string/delete_hint"
+        android:textColor="@color/text_hint"
+        android:textSize="@dimen/text_caption" />
+
+    <!-- 按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_sm"
+            android:text="@string/delete_cancel"
+            android:textColor="@color/text_secondary" />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_sm"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:backgroundTint="@color/error"
+            android:text="@string/delete_confirm"
+            android:textColor="@color/on_primary" />
+
+    </LinearLayout>
+
+</LinearLayout>

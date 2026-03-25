@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 新建小说弹窗布局 -->
+<!-- 命名规范遵循 AGENTS.md 2.1节 -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/surface"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_title"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_h2"
+        android:textStyle="bold" />
+
+    <!-- 小说名称输入 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:text="@string/create_name_label"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_body_sm" />
+
+    <EditText
+        android:id="@+id/et_novel_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/input_height"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:background="@drawable/bg_input"
+        android:hint="@string/create_name_hint"
+        android:inputType="text"
+        android:maxLength="50"
+        android:maxLines="1"
+        android:paddingStart="@dimen/input_padding"
+        android:paddingEnd="@dimen/input_padding"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        android:textSize="@dimen/text_body" />
+
+    <!-- 小说类型选择 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="@string/create_genre_label"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_body_sm" />
+
+    <RadioGroup
+        android:id="@+id/rg_genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_xuanhuan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_genre_xuanhuan"
+            android:textSize="@dimen/text_body_sm" />
+
+        <RadioButton
+            android:id="@+id/rb_dushi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_genre_dushi"
+            android:textSize="@dimen/text_body_sm" />
+
+        <RadioButton
+            android:id="@+id/rb_kehuan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_genrekehuan"
+            android:textSize="@dimen/text_body_sm" />
+
+    </RadioGroup>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_wuxia"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_genre_wuxia"
+            android:textSize="@dimen/text_body_sm" />
+
+        <RadioButton
+            android:id="@+id/rb_qihuan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_genre_qihuan"
+            android:textSize="@dimen/text_body_sm" />
+
+        <RadioButton
+            android:id="@+id/rb_lishi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_genre_lishi"
+            android:textSize="@dimen/text_body_sm" />
+
+    </RadioGroup>
+
+    <!-- 语音输入提示 -->
+    <TextView
+        android:id="@+id/tv_voice_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:gravity="center"
+        android:text="@string/voice_hint_create"
+        android:textColor="@color/text_hint"
+        android:textSize="@dimen/text_caption"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <!-- 按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_sm"
+            android:text="@string/create_cancel"
+            android:textColor="@color/text_secondary" />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_sm"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:backgroundTint="@color/primary"
+            android:text="@string/create_confirm"
+            android:textColor="@color/on_primary" />
+
+    </LinearLayout>
+
+</LinearLayout>
