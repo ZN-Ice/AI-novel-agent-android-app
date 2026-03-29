@@ -323,6 +323,15 @@ class EditorViewModel @Inject constructor(
     }
 
     /**
+     * 停止自动保存（仅用于测试）
+     */
+    @androidx.annotation.VisibleForTesting
+    fun stopAutoSave() {
+        autoSaveJob?.cancel()
+        autoSaveJob = null
+    }
+
+    /**
      * 清空撤销/重做栈
      */
     private fun clearUndoRedoStack() {
