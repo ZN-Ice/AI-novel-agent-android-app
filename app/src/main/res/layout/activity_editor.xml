@@ -5,9 +5,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedIds"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface"
     tools:context=".ui.editor.EditorActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -115,6 +115,7 @@
                 android:background="@null"
                 android:gravity="top|start"
                 android:hint="@string/hint_editor"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine|textAutoCorrect"
                 android:minHeight="300dp"
                 android:padding="@dimen/spacing_md"

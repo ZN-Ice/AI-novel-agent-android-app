@@ -45,11 +45,8 @@
     <string name="editor_saved">已保存</string>
     <string name="editor_unsaved">未保存</string>
     <string name="editor_save_error">保存失败</string>
-    <string name="editor_no_novel">小说不存在</string>
-    <string name="editor_no_chapter">暂无章节</string>
     <string name="editor_chapter_format">第%1$d章 / 共%2$d章</string>
     <string name="editor_word_count">%d字</string>
-    <string name="editor_ai_complete">AI创作完成</string>
     <string name="hint_editor">开始创作…</string>
 
     <!-- ============ 语音模块 ============ -->
