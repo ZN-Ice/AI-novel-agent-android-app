@@ -10,7 +10,23 @@
       "Bash(bash:*)",
       "Bash(gh run:*)",
       "WebSearch",
-      "mcp__web-reader__webReader"
+      "mcp__web-reader__webReader",
+      "Bash(git:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew testDebugUnitTest:*)",
+      "Bash(gh pr:*)",
+      "Bash(./gradlew:*)",
+      "Bash(gh api:*)",
+      "mcp__zread__get_repo_structure",
+      "mcp__zread__read_file",
+      "Bash(node:*)",
+      "Bash(claude:*)",
+      "Bash(npm list:*)",
+      "mcp__web-search-prime__web_search_prime",
+      "Bash(echo:*)",
+      "Write",
+      "Edit"
     ]
   }
 }

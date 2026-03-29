@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 间距标准 - 小屏适配 -->
+    <dimen name="spacing_xs">3dp</dimen>
+    <dimen name="spacing_sm">6dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">18dp</dimen>
+    <dimen name="spacing_xl">24dp</dimen>
+
+    <!-- 字体大小 - 小屏适配 -->
+    <dimen name="text_h1">20sp</dimen>
+    <dimen name="text_h2">18sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_caption">10sp</dimen>
+</resources>
