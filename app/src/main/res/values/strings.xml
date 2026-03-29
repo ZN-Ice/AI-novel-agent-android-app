@@ -43,6 +43,10 @@
     <string name="editor_voice_input">语音输入</string>
     <string name="editor_saving">保存中…</string>
     <string name="editor_saved">已保存</string>
+    <string name="editor_unsaved">未保存</string>
+    <string name="editor_save_error">保存失败</string>
+    <string name="editor_chapter_format">第%1$d章 / 共%2$d章</string>
+    <string name="editor_word_count">%d字</string>
     <string name="hint_editor">开始创作…</string>
 
     <!-- ============ 语音模块 ============ -->
