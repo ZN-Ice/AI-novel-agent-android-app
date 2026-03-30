@@ -305,11 +305,11 @@
     "task_desc": "实现AIClient SSE流式生成 + kotlinx.serialization替代regex解析",
     "module": "ai",
     "executor": "Claude Code",
-    "status": "进行中",
+    "status": "已完成",
     "create_time": "2026-03-31 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "实现真实SSE流式请求、替换JSON regex为kotlinx.serialization"
+    "finish_time": "2026-03-31 10:30:00",
+    "check_result": "通过",
+    "remark": "已完成：SSE流式生成（SSEParser+GLMStreamDto）、kotlinx.serialization替代regex、17个序列化测试用例"
   },
   {
     "task_id": "T20260331002",
