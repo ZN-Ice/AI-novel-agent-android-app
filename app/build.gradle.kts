@@ -131,8 +131,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     classDirectories.setFrom(debugTree)
     sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
     executionData.setFrom(fileTree(layout.buildDirectory.get()) {
-        include("outputs/unit_test_code_coverage/debugUnitTest/test-debugUnitTest.exec")
-        include("jacoco/testDebugUnitTest.exec")
+        include("**/*.exec")
     })
 }
 
@@ -146,8 +145,7 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     classDirectories.setFrom(debugTree)
     sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
     executionData.setFrom(fileTree(layout.buildDirectory.get()) {
-        include("outputs/unit_test_code_coverage/debugUnitTest/test-debugUnitTest.exec")
-        include("jacoco/testDebugUnitTest.exec")
+        include("**/*.exec")
     })
 
     violationRules {

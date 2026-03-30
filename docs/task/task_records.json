@@ -298,5 +298,53 @@
     "finish_time": "2026-03-30 21:00:00",
     "check_result": "通过",
     "remark": "已完成：文档索引、更新日志"
+  },
+  {
+    "task_id": "T20260331001",
+    "task_type": "功能开发",
+    "task_desc": "实现AIClient SSE流式生成 + kotlinx.serialization替代regex解析",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "进行中",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": null,
+    "check_result": null,
+    "remark": "实现真实SSE流式请求、替换JSON regex为kotlinx.serialization"
+  },
+  {
+    "task_id": "T20260331002",
+    "task_type": "功能开发",
+    "task_desc": "ContextManager对接Room数据库加载角色/世界观设定",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "待执行",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": null,
+    "check_result": null,
+    "remark": "从数据库加载角色设定、世界观设定，实现智能上下文构建"
+  },
+  {
+    "task_id": "T20260331003",
+    "task_type": "功能开发",
+    "task_desc": "AIRepository断点续创持久化到Room数据库",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "待执行",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": null,
+    "check_result": null,
+    "remark": "检查点从内存存储改为Room持久化，支持应用重启后续创"
+  },
+  {
+    "task_id": "T20260331004",
+    "task_type": "功能开发",
+    "task_desc": "实现AI失败兜底策略（按错误码分级处理）",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "待执行",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": null,
+    "check_result": null,
+    "remark": "按AGENTS.md 4.4规范实现：401显示错误、429/500重试、504保存草稿、-1本地模板"
   }
 ]
