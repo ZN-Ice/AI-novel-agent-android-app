@@ -197,11 +197,11 @@
     "task_desc": "实现删除确认弹窗（DeleteConfirmDialog）",
     "module": "ui/delete",
     "executor": "Claude Code",
-    "status": "进行中",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：二次确认弹窗、语音确认/取消、软删除逻辑"
+    "finish_time": "2026-03-30 18:00:00",
+    "check_result": "通过",
+    "remark": "已完成：DeleteConfirmDialog二次确认弹窗、语音确认/取消、软删除逻辑"
   },
   {
     "task_id": "T20260324017",
@@ -257,7 +257,7 @@
     "task_desc": "实现离线语音兜底",
     "module": "voice",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "进行中",
     "create_time": "2026-03-24 09:00:00",
     "finish_time": null,
     "check_result": null,
@@ -281,11 +281,11 @@
     "task_desc": "编写docs设计文档",
     "module": "docs/design",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要编写：ui.md（界面设计规范）、api.md（AI接口文档）、voice.md（语音交互流程）"
+    "finish_time": "2026-03-30 20:00:00",
+    "check_result": "通过",
+    "remark": "已完成：ui.md（界面设计规范）、api.md（AI接口文档）、voice.md（语音交互流程）"
   },
   {
     "task_id": "T20260324024",
@@ -293,10 +293,10 @@
     "task_desc": "编写docs/README.md文档索引",
     "module": "docs",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要编写：文档索引、更新日志"
+    "finish_time": "2026-03-30 21:00:00",
+    "check_result": "通过",
+    "remark": "已完成：文档索引、更新日志"
   }
 ]
