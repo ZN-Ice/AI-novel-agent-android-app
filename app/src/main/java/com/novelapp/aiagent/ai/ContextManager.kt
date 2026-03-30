@@ -7,6 +7,8 @@ import com.novelapp.aiagent.model.WorldSetting
 import com.novelapp.aiagent.model.ChapterContent
 import com.novelapp.aiagent.data.repository.ChapterRepository
 import com.novelapp.aiagent.data.repository.NovelRepository
+import com.novelapp.aiagent.data.local.CharacterDao
+import com.novelapp.aiagent.data.local.WorldSettingDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -27,7 +29,9 @@ import javax.inject.Singleton
 @Singleton
 class ContextManager @Inject constructor(
     private val novelRepository: NovelRepository,
-    private val chapterRepository: ChapterRepository
+    private val chapterRepository: ChapterRepository,
+    private val characterDao: CharacterDao,
+    private val worldSettingDao: WorldSettingDao
 ) {
     companion object {
         private const val TAG = "ContextManager"
@@ -94,9 +98,26 @@ class ContextManager @Inject constructor(
             )
         }
 
-        // TODO: 从数据库加载角色和世界观设定
-        val characters = emptyList<CharacterInfo>()
-        val worldSettings = emptyList<WorldSetting>()
+        // 从数据库加载角色和世界观设定
+        val characterEntities = characterDao.getCharactersByNovelId(novelId)
+        val characters = characterEntities.map { entity ->
+            CharacterInfo(
+                name = entity.name,
+                role = entity.role,
+                description = entity.description,
+                personality = entity.personality,
+                abilities = entity.abilities
+            )
+        }
+
+        val worldSettingEntities = worldSettingDao.getWorldSettingsByNovelId(novelId)
+        val worldSettings = worldSettingEntities.map { entity ->
+            WorldSetting(
+                key = entity.key,
+                value = entity.value,
+                description = entity.description
+            )
+        }
 
         return NovelContext(
             novelId = novelId,
