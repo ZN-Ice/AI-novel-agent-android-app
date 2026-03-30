@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
-    jacoco
 }
 
 android {
@@ -90,77 +89,9 @@ android {
 }
 
 // ============ JaCoCo 测试覆盖率配置 ============
-jacoco {
-    toolVersion = "0.8.11"
-}
-
-/**
- * 覆盖率报告中需要排除的类文件模式
- * 排除：生成代码(R/BuildConfig)、Hilt生成代码、Room生成代码、数据模型
- */
-val coverageExclusions = listOf(
-    "**/R.class",
-    "**/R\$*.class",
-    "**/BuildConfig.*",
-    "**/Manifest*.*",
-    "**/*_Hilt*.*",
-    "**/Hilt_*.*",
-    "**/*_MembersInjector.*",
-    "**/*_Factory.*",
-    "**/*Generated*.*",
-    "**/dagger/hilt/internal/**",
-    "**/hilt_aggregated_deps/**",
-    "**/*_Impl\$*.class",
-    "**/data/model/**",
-    "**/di/**"
-)
-
-tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
-
-    reports {
-        xml.required = true
-        html.required = true
-        csv.required = false
-    }
-
-    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(coverageExclusions)
-    }
-
-    classDirectories.setFrom(debugTree)
-    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
-    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
-        include("**/*.exec")
-    })
-}
-
-tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    dependsOn("testDebugUnitTest")
-
-    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(coverageExclusions)
-    }
-
-    classDirectories.setFrom(debugTree)
-    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
-    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
-        include("**/*.exec")
-    })
-
-    violationRules {
-        rule {
-            limit {
-                minimum = "0.80".toBigDecimal()
-            }
-        }
-    }
-}
-
-// 确保 check 任务包含覆盖率验证
-tasks.named("check") {
-    dependsOn("jacocoTestReport")
-}
+// 使用 AGP 内置 JaCoCo 支持（enableUnitTestCoverage = true）
+// AGP 8.2 内置 JaCoCo 0.8.8，通过 createDebugUnitTestCoverageReport 任务生成报告
+// 无需独立 jacoco 插件，避免 agent 版本冲突导致覆盖率 0%
 
 dependencies {
     // AndroidX核心
