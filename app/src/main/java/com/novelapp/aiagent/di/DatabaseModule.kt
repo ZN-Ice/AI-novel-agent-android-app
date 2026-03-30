@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.novelapp.aiagent.data.local.AppDatabase
 import com.novelapp.aiagent.data.local.ChapterDao
+import com.novelapp.aiagent.data.local.CharacterDao
 import com.novelapp.aiagent.data.local.NovelDao
+import com.novelapp.aiagent.data.local.WorldSettingDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,9 +33,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-            // 允许主线程查询（仅用于简单查询，生产环境应移除）
-            // .allowMainThreadQueries()
-            // 数据库迁移策略
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -48,5 +48,17 @@ object DatabaseModule {
     @Singleton
     fun provideChapterDao(database: AppDatabase): ChapterDao {
         return database.chapterDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCharacterDao(database: AppDatabase): CharacterDao {
+        return database.characterDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorldSettingDao(database: AppDatabase): WorldSettingDao {
+        return database.worldSettingDao()
     }
 }

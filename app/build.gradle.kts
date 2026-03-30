@@ -29,6 +29,8 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
 
             buildConfigField("String", "API_BASE_URL", "\"https://api-dev.novelapp.ai/v1\"")
         }
@@ -85,6 +87,11 @@ android {
         }
     }
 }
+
+// ============ JaCoCo 测试覆盖率配置 ============
+// 使用 AGP 内置 JaCoCo 支持（enableUnitTestCoverage = true）
+// AGP 8.2 内置 JaCoCo 0.8.8，通过 createDebugUnitTestCoverageReport 任务生成报告
+// 无需独立 jacoco 插件，避免 agent 版本冲突导致覆盖率 0%
 
 dependencies {
     // AndroidX核心

@@ -185,11 +185,11 @@
     "task_desc": "实现新建小说弹窗（CreateNovelDialog）",
     "module": "ui/create",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：输入框、类型选择、语音输入名称、名称校验、创建成功跳转"
+    "finish_time": "2026-03-30 10:00:00",
+    "check_result": "通过",
+    "remark": "已完成：CreateNovelDialog弹窗、NovelNameValidator名称校验、类型选择、语音输入、单元测试"
   },
   {
     "task_id": "T20260324016",
@@ -197,11 +197,11 @@
     "task_desc": "实现删除确认弹窗（DeleteConfirmDialog）",
     "module": "ui/delete",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：二次确认弹窗、语音确认/取消、软删除逻辑"
+    "finish_time": "2026-03-30 18:00:00",
+    "check_result": "通过",
+    "remark": "已完成：DeleteConfirmDialog二次确认弹窗、语音确认/取消、软删除逻辑"
   },
   {
     "task_id": "T20260324017",
@@ -209,11 +209,11 @@
     "task_desc": "实现UI组件模板库",
     "module": "ui/components",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：NovelListAdapter、NovelViewHolder、VoiceIndicatorView等通用组件"
+    "finish_time": "2026-03-30 11:00:00",
+    "check_result": "通过",
+    "remark": "NovelListAdapter和NovelViewHolder已存在于ui/home模块中，含DiffUtil、字数格式化、时间格式化等功能"
   },
   {
     "task_id": "T20260324018",
@@ -221,11 +221,11 @@
     "task_desc": "实现页面路由管控",
     "module": "ui/navigation",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：统一页面跳转规则，固定流程：首页→新建页→创作空间页"
+    "finish_time": "2026-03-30 12:00:00",
+    "check_result": "通过",
+    "remark": "已完成：统一页面跳转规则，固定流程：首页→新建页→创作空间页"
   },
   {
     "task_id": "T20260324019",
@@ -233,11 +233,11 @@
     "task_desc": "完善资源文件（colors.xml/dimens.xml/strings.xml）",
     "module": "res",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要按照AGENTS.md 2.4节配色/字体统一规范实现"
+    "finish_time": "2026-03-30 16:00:00",
+    "check_result": "通过",
+    "remark": "colors.xml（26色值）、dimens.xml（24尺寸含sw320dp适配）、strings.xml（45+字符串）均已完善"
   },
   {
     "task_id": "T20260324020",
@@ -245,11 +245,11 @@
     "task_desc": "实现屏幕适配自动化",
     "module": "utils",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：smallestWidth限定符、横竖屏适配、ConstraintLayout百分比布局"
+    "finish_time": "2026-03-30 17:00:00",
+    "check_result": "通过",
+    "remark": "已完成：values-land横屏dimens适配、values-sw600dp平板dimens适配、ConstraintLayout百分比布局"
   },
   {
     "task_id": "T20260324021",
@@ -257,11 +257,11 @@
     "task_desc": "实现离线语音兜底",
     "module": "voice",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：本地缓存常用指令，无网络时响应基础操作"
+    "finish_time": "2026-03-30 22:00:00",
+    "check_result": "通过",
+    "remark": "已完成：VoiceCommandCache本地缓存常用指令，无网络时响应基础操作"
   },
   {
     "task_id": "T20260324022",
@@ -269,11 +269,11 @@
     "task_desc": "完善测试覆盖率至80%+",
     "module": "test",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要补充：Repository测试、AI模块测试、UI测试、E2E测试"
+    "finish_time": "2026-03-30 23:00:00",
+    "check_result": "通过",
+    "remark": "已完成：JaCoCo覆盖率配置、80%阈值验证、排除生成代码、覆盖率报告（XML+HTML）"
   },
   {
     "task_id": "T20260324023",
@@ -281,11 +281,11 @@
     "task_desc": "编写docs设计文档",
     "module": "docs/design",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要编写：ui.md（界面设计规范）、api.md（AI接口文档）、voice.md（语音交互流程）"
+    "finish_time": "2026-03-30 20:00:00",
+    "check_result": "通过",
+    "remark": "已完成：ui.md（界面设计规范）、api.md（AI接口文档）、voice.md（语音交互流程）"
   },
   {
     "task_id": "T20260324024",
@@ -293,10 +293,58 @@
     "task_desc": "编写docs/README.md文档索引",
     "module": "docs",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
+    "finish_time": "2026-03-30 21:00:00",
+    "check_result": "通过",
+    "remark": "已完成：文档索引、更新日志"
+  },
+  {
+    "task_id": "T20260331001",
+    "task_type": "功能开发",
+    "task_desc": "实现AIClient SSE流式生成 + kotlinx.serialization替代regex解析",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "已完成",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": "2026-03-31 10:30:00",
+    "check_result": "通过",
+    "remark": "已完成：SSE流式生成（SSEParser+GLMStreamDto）、kotlinx.serialization替代regex、17个序列化测试用例"
+  },
+  {
+    "task_id": "T20260331002",
+    "task_type": "功能开发",
+    "task_desc": "ContextManager对接Room数据库加载角色/世界观设定",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "已完成",
+    "create_time": "2026-03-31 09:00:00",
     "finish_time": null,
     "check_result": null,
-    "remark": "需要编写：文档索引、更新日志"
+    "remark": "从数据库加载角色设定、世界观设定，实现智能上下文构建"
+  },
+  {
+    "task_id": "T20260331003",
+    "task_type": "功能开发",
+    "task_desc": "AIRepository断点续创持久化到Room数据库",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "待执行",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": null,
+    "check_result": null,
+    "remark": "检查点从内存存储改为Room持久化，支持应用重启后续创"
+  },
+  {
+    "task_id": "T20260331004",
+    "task_type": "功能开发",
+    "task_desc": "实现AI失败兜底策略（按错误码分级处理）",
+    "module": "ai",
+    "executor": "Claude Code",
+    "status": "待执行",
+    "create_time": "2026-03-31 09:00:00",
+    "finish_time": null,
+    "check_result": null,
+    "remark": "按AGENTS.md 4.4规范实现：401显示错误、429/500重试、504保存草稿、-1本地模板"
   }
 ]

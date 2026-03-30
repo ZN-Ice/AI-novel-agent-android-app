@@ -11,7 +11,8 @@ plugins {
 // 自定义任务：运行所有检查
 tasks.register("runAllChecks") {
     dependsOn(":app:lint")
-    dependsOn(":app:test")
+    dependsOn(":app:testDebugUnitTest")
+    dependsOn(":app:createDebugUnitTestCoverageReport")
 
     doLast {
         println("All checks passed!")
