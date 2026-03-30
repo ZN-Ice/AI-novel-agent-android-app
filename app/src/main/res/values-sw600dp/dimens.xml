@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============ 间距标准 (sw600dp Tablet) ============ -->
+    <dimen name="spacing_xs">6dp</dimen>
+    <dimen name="spacing_sm">12dp</dimen>
+    <dimen name="spacing_md">24dp</dimen>
+    <dimen name="spacing_lg">32dp</dimen>
+    <dimen name="spacing_xl">48dp</dimen>
+    <dimen name="spacing_xxl">64dp</dimen>
+
+    <!-- ============ 字体大小 ============ -->
+    <dimen name="text_h1">32sp</dimen>
+    <dimen name="text_h2">26sp</dimen>
+    <dimen name="text_h3">22sp</dimen>
+    <dimen name="text_body">18sp</dimen>
+    <dimen name="text_body_sm">16sp</dimen>
+    <dimen name="text_caption">14sp</dimen>
+    <dimen name="text_small">12sp</dimen>
+
+    <!-- ============ 圆角 ============ -->
+    <dimen name="corner_sm">6dp</dimen>
+    <dimen name="corner_md">12dp</dimen>
+    <dimen name="corner_lg">20dp</dimen>
+    <dimen name="corner_xl">28dp</dimen>
+    <dimen name="corner_full">999dp</dimen>
+
+    <!-- ============ 卡片 ============ -->
+    <dimen name="card_elevation">3dp</dimen>
+    <dimen name="card_corner">@dimen/corner_md</dimen>
+    <dimen name="card_padding">@dimen/spacing_md</dimen>
+
+    <!-- ============ 按钮尺寸 ============ -->
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="button_height_sm">42dp</dimen>
+    <dimen name="button_corner">@dimen/corner_md</dimen>
+    <dimen name="button_padding">@dimen/spacing_lg</dimen>
+
+    <!-- ============ 图标尺寸 ============ -->
+    <dimen name="icon_xs">20dp</dimen>
+    <dimen name="icon_sm">32dp</dimen>
+    <dimen name="icon_md">40dp</dimen>
+    <dimen name="icon_lg">56dp</dimen>
+    <dimen name="icon_xl">80dp</dimen>
+
+    <!-- ============ 输入框 ============ -->
+    <dimen name="input_height">56dp</dimen>
+    <dimen name="input_corner">@dimen/corner_md</dimen>
+    <dimen name="input_padding">@dimen/spacing_md</dimen>
+
+    <!-- ============ 列表项 ============ -->
+    <dimen name="list_item_height">88dp</dimen>
+    <dimen name="list_item_padding">@dimen/spacing_md</dimen>
+
+    <!-- ============ 工具栏 ============ -->
+    <dimen name="toolbar_height">64dp</dimen>
+
+    <!-- ============ 底部导航 ============ -->
+    <dimen name="bottom_nav_height">64dp</dimen>
+
+    <!-- ============ 语音波形 ============ -->
+    <dimen name="voice_wave_size">56dp</dimen>
+
+    <!-- ============ 编辑器 ============ -->
+    <dimen name="editor_padding">@dimen/spacing_md</dimen>
+    <dimen name="editor_line_spacing">10dp</dimen>
+</resources>
