@@ -12,6 +12,7 @@ plugins {
 tasks.register("runAllChecks") {
     dependsOn(":app:lint")
     dependsOn(":app:test")
+    dependsOn(":app:jacocoTestReport")
 
     doLast {
         println("All checks passed!")

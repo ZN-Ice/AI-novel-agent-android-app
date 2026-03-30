@@ -257,11 +257,11 @@
     "task_desc": "实现离线语音兜底",
     "module": "voice",
     "executor": "Claude Code",
-    "status": "进行中",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要实现：本地缓存常用指令，无网络时响应基础操作"
+    "finish_time": "2026-03-30 22:00:00",
+    "check_result": "通过",
+    "remark": "已完成：VoiceCommandCache本地缓存常用指令，无网络时响应基础操作"
   },
   {
     "task_id": "T20260324022",
@@ -269,11 +269,11 @@
     "task_desc": "完善测试覆盖率至80%+",
     "module": "test",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-24 09:00:00",
-    "finish_time": null,
-    "check_result": null,
-    "remark": "需要补充：Repository测试、AI模块测试、UI测试、E2E测试"
+    "finish_time": "2026-03-30 23:00:00",
+    "check_result": "通过",
+    "remark": "已完成：JaCoCo覆盖率配置、80%阈值验证、排除生成代码、覆盖率报告（XML+HTML）"
   },
   {
     "task_id": "T20260324023",

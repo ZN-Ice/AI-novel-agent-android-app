@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
+    jacoco
 }
 
 android {
@@ -29,6 +30,8 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
 
             buildConfigField("String", "API_BASE_URL", "\"https://api-dev.novelapp.ai/v1\"")
         }
@@ -84,6 +87,81 @@ android {
             excludes += "/META-INF/DEPENDENCIES"
         }
     }
+}
+
+// ============ JaCoCo 测试覆盖率配置 ============
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+/**
+ * 覆盖率报告中需要排除的类文件模式
+ * 排除：生成代码(R/BuildConfig)、Hilt生成代码、Room生成代码、数据模型
+ */
+val coverageExclusions = listOf(
+    "**/R.class",
+    "**/R\$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*_Hilt*.*",
+    "**/Hilt_*.*",
+    "**/*_MembersInjector.*",
+    "**/*_Factory.*",
+    "**/*Generated*.*",
+    "**/dagger/hilt/internal/**",
+    "**/hilt_aggregated_deps/**",
+    "**/*_Impl\$*.class",
+    "**/data/model/**",
+    "**/di/**"
+)
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(coverageExclusions)
+    }
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
+    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/test-debugUnitTest.exec")
+        include("jacoco/testDebugUnitTest.exec")
+    })
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn("testDebugUnitTest")
+
+    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(coverageExclusions)
+    }
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
+    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/test-debugUnitTest.exec")
+        include("jacoco/testDebugUnitTest.exec")
+    })
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+// 确保 check 任务包含覆盖率验证
+tasks.named("check") {
+    dependsOn("jacocoTestReport")
 }
 
 dependencies {
