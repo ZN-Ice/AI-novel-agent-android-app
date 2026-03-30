@@ -1,0 +1,6 @@
+请读取 .claude-task.md 文件，按照 AGENTS.md 核心工作流程完成任务：
+1. 修复 JaCoCo 覆盖率配置（当前显示 0%）
+2. 运行完整本地验证（lint + test + build）
+3. 提交代码并创建 PR 合并到 main
+
+请按照 TDD 流程（RED-GREEN-REFACTOR）开发。

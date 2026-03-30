@@ -317,7 +317,7 @@
     "task_desc": "ContextManager对接Room数据库加载角色/世界观设定",
     "module": "ai",
     "executor": "Claude Code",
-    "status": "待执行",
+    "status": "已完成",
     "create_time": "2026-03-31 09:00:00",
     "finish_time": null,
     "check_result": null,
